@@ -4,7 +4,7 @@
 
  ------
  ### Dependencies and starting the script
- This script requires Node v8 or above to work as it uses async/await. Install other dependencies with 
+ This script requires Node v8 or above to work as it uses async/await. Install other dependencies with
  ```
  npm i
  ```
@@ -37,8 +37,22 @@ then the folder structure in `D:/Wikidot/` will be:
 ```
 .
 ├──scp-sandbox-3
-|  └──a
+|   └──a
 ├──wanderers-sandbox
-|  └──b~c
+|   └──b~c
 ```
 Note that colons are converted into tildes, as colons are forbidden symbols for file names in Windows.
+
+----
+### File Structure
+The file that you save should be of the following structure:
+```
+title: (your title here)
+tags: (tags here)
+comment: (revision comment here)
+(another line of comment here)
+~~~~~~
+(your page source here)
+```
+Any of title, tags and comment are optional but are suggested to be kept even if they are empty.
+Title and tags only accept one line, any other lines will be treated as revision comments.

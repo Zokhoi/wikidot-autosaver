@@ -36,23 +36,27 @@ const wd = new WD(config.site.map(s=>`http://${s}.wikidot.com`));
         comment: "",
         tags: ""
       }
-      let metadata = raw.split("~~~~~~")[0].split("\n").filter(v=>!!v);
-      let placeholder = JSON.parse(JSON.stringify(metadata));
       let sauce = raw.split("~~~~~~");
-      sauce.shift();
-      sauce.join("~~~~~~").split("\n").shift();
-      info.source = sauce.join("\n");
-      for (let ln of metadata) {
-        if (ln.toLowerCase().startsWith("title")) {
-          placeholder.splice(placeholder.indexOf(ln), 1)
-          info.title = ln.substring("title:".length).split(" ").filter(v=>!!v).join(" ")
-        } else if (ln.toLowerCase().startsWith("tags")) {
-          placeholder.splice(placeholder.indexOf(ln), 1)
-          info.tags = ln.substring("tags:".length).split(" ").filter(v=>!!v).join(" ")
-        } else if (ln.toLowerCase().startsWith("comment")) {
-          placeholder.splice(placeholder.indexOf(ln), 1)
-          placeholder.unshift(ln.substring("comment:".length).split(" ").filter(v=>!!v).join(" "))
-          info.comment = placeholder.join("\n");
+      if (sauce.length===1) {
+        info.source = raw;
+      } else {
+        let metadata = raw.split("~~~~~~")[0].split("\n").filter(v=>!!v);
+        let placeholder = JSON.parse(JSON.stringify(metadata));
+        sauce.shift();
+        sauce.join("~~~~~~").split("\n").shift();
+        info.source = sauce.join("\n");
+        for (let ln of metadata) {
+          if (ln.toLowerCase().startsWith("title")) {
+            placeholder.splice(placeholder.indexOf(ln), 1)
+            info.title = ln.substring("title:".length).split(" ").filter(v=>!!v).join(" ")
+          } else if (ln.toLowerCase().startsWith("tags")) {
+            placeholder.splice(placeholder.indexOf(ln), 1)
+            info.tags = ln.substring("tags:".length).split(" ").filter(v=>!!v).join(" ")
+          } else if (ln.toLowerCase().startsWith("comment")) {
+            placeholder.splice(placeholder.indexOf(ln), 1)
+            placeholder.unshift(ln.substring("comment:".length).split(" ").filter(v=>!!v).join(" "))
+            info.comment = placeholder.join("\n");
+          }
         }
       }
       wd.edit(`http://${s}.wikidot.com`, p.replace(/~/g,':').split(".")[0], info).then(
