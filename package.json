@@ -1,0 +1,17 @@
+{
+  "name": "wikidot-autosaver",
+  "version": "1.0.0",
+  "description": "A simple script that auto-saves to wikidot.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": ["wikidot", "autosave"],
+  "author": "Joch2520",
+  "repository": "github:joch2520/wikidot-autosaver",
+  "license": "MIT",
+  "dependencies": {
+    "got": "^11.1.4",
+    "readline-sync": "^1.4.10"
+  }
+}
