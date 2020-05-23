@@ -64,5 +64,4 @@ const wd = new WD(config.site.map(s=>`http://${s}.wikidot.com`));
       ).catch(e=>console.log(e));
     })
   }
-  console.log(`Push finished.`)
 })().catch(e=>{throw e})
