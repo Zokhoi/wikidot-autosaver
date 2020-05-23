@@ -17,24 +17,26 @@ class Site {
       }).json();
   };
 
+  async module(cookies, moduleName, params) {
+    return await this.req(cookies, Object.assign({moduleName: moduleName},params))
+  };
+
+  async action(cookies, action, params) {
+    return await this.req(cookies, Object.assign({action: action, moduleName: "Empty"},params))
+  };
+
   async edit(cookies, wiki_page, params) {
-    let lock = await this.req({
-            moduleName: 'edit/PageEditModule',
+    var lock = await this.module(cookies, 'edit/PageEditModule', {
             mode: 'page',
             wiki_page: wiki_page,
             force_lock: true})
-    return await this.req(cookies, Object.assign({
-      action: "WikiPageAction",
-      event: "savePage",
-      moduleName: "Empty",
+    return await this.action(cookies, 'WikiPageAction', Object.assign({
+      event: 'savePage',
       wiki_page: wiki_page,
       lock_id: lock.lock_id,
       lock_secret: lock.lock_secret,
       revision_id: lock.page_revision_id||null,
-      title: "",
-      source: "",
-      comment: ""
-    },params))
+    }, params))
   }
 }
 
@@ -82,10 +84,6 @@ module.exports = class WD {
   	this.cookie.expire = tmp[1].split("=")[1]
     this.cookie.auth = `${this.cookie.sess}; wikidot_udsession=1; `
     return this;
-  }
-
-  async req(site, params) {
-    return await this.bases.get(site).req(this.cookie, params);
   }
 
   async edit(site, wiki_page, params) {
