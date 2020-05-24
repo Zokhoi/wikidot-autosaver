@@ -37,9 +37,9 @@ then the folder structure in `D:/Wikidot/` will be:
 ```
 .
 ├──scp-sandbox-3
-|   └──a
+|   └──a.txt
 ├──wanderers-sandbox
-|   └──b~c
+|   └──b~c.txt
 ```
 Note that colons are converted into tildes, as colons are forbidden symbols for file names in Windows.
 
