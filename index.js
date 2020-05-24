@@ -33,7 +33,7 @@ const wd = new WD(config.site.map(s=>`http://${s}.wikidot.com`));
       let info = {
         title: "",
         source: "",
-        comment: "",
+        comments: "",
         tags: ""
       }
       let sauce = raw.split("~~~~~~");
@@ -52,10 +52,10 @@ const wd = new WD(config.site.map(s=>`http://${s}.wikidot.com`));
           } else if (ln.toLowerCase().startsWith("tags")) {
             placeholder.splice(placeholder.indexOf(ln), 1)
             info.tags = ln.substring("tags:".length).split(" ").filter(v=>!!v).join(" ")
-          } else if (ln.toLowerCase().startsWith("comment")) {
+          } else if (ln.toLowerCase().startsWith("comments")) {
             placeholder.splice(placeholder.indexOf(ln), 1)
-            placeholder.unshift(ln.substring("comment:".length).split(" ").filter(v=>!!v).join(" "))
-            info.comment = placeholder.join("\n");
+            placeholder.unshift(ln.substring("comments:".length).split(" ").filter(v=>!!v).join(" "))
+            info.comments = placeholder.join("\n");
           }
         }
       }

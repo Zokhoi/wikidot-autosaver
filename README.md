@@ -49,8 +49,8 @@ The file that you save should be of the following structure:
 ```
 title: (your title here)
 tags: (tags here)
-comment: (revision comment here)
-(another line of comment here)
+comments: (revision comments here)
+(another line of comments here)
 ~~~~~~
 (your page source here)
 ```
