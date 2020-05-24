@@ -60,7 +60,7 @@ const wd = new WD(config.site.map(s=>`http://${s}.wikidot.com`));
         }
       }
       wd.edit(`http://${s}.wikidot.com`, p.replace(/~/g,':').split(".")[0], info).then(
-        ()=>{console.log(`Successfully pushed ${p.replace(/~/g,':').split(".")[0]} to http://${s}.wikidot.com`)}
+        ()=>{console.log(`Successfully pushed ${p} to http://${s}.wikidot.com/${p.replace(/~/g,':').split(".")[0]}`)}
       ).catch(e=>console.log(e));
     })
   }
