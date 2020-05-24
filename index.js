@@ -24,11 +24,11 @@ const wd = new WD(config.site.map(s=>`http://${s}.wikidot.com`));
 
 !(async ()=>{
   await wd.askLogin();
-
+  let wait = 0;
   for (let s of dir) {
     let pages = fs.readdirSync(path.join(config.source,s))
                   .filter(f => fs.statSync(path.join(config.source,s,f)).isFile());
-    pages.forEach(p=>{
+    for (let p of pages) {
       let raw = fs.readFileSync(path.join(config.source,s,p), 'utf-8')
       let info = {
         title: "",
@@ -59,9 +59,19 @@ const wd = new WD(config.site.map(s=>`http://${s}.wikidot.com`));
           }
         }
       }
-      wd.edit(`http://${s}.wikidot.com`, p.replace(/~/g,':').split(".")[0], info).then(
-        ()=>{console.log(`Successfully pushed ${p} to http://${s}.wikidot.com/${p.replace(/~/g,':').split(".")[0]}`)}
-      ).catch(e=>console.log(e));
-    })
+      setTimeout(()=>{
+        let err = null;
+        wd.edit(`http://${s}.wikidot.com`, p.replace(/~/g,':').split(".")[0], info)
+          .catch(e=>{
+          err = e
+          if (!e.message=="Response code 500 (Internal Server Error)") throw e
+        }).finally(()=>{
+          if (!err) {
+            console.log(`Successfully pushed to http://${s}.wikidot.com/${p.replace(/~/g,':').split(".")[0]}`);
+          }
+        });
+      }, (pages.indexOf(p)*2000+wait))
+    }
+    wait+=pages.length*2000;
   }
 })().catch(e=>{throw e})
