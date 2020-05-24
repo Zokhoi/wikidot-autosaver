@@ -26,7 +26,12 @@ for (let s of config.site) {
 const wd = new WD(config.site.map(s=>`http://${s}.wikidot.com`));
 
 !(async ()=>{
-  await wd.askLogin();
+  let tmp = true;
+  while (tmp) {
+    tmp = null;
+    await wd.askLogin().catch(e=>{tmp=e; console.log(e.message)});
+  }
+  console.log("Successfully logged in.")
   let wait = 0;
   for (let s of dir) {
     let pages = fs.readdirSync(path.join(config.source,s))
@@ -77,11 +82,11 @@ const wd = new WD(config.site.map(s=>`http://${s}.wikidot.com`));
           if (!e.message=="Response code 500 (Internal Server Error)") throw e
         }).finally(()=>{
           if (!err) {
-            console.log(`Successfully pushed to http://${s}.wikidot.com/${p.replace(/~/g,':').split(".")[0]}`);
+            console.log(`Successfully posted to http://${s}.wikidot.com/${p.replace(/~/g,':').split(".")[0]}`);
           }
         });
-      }, (pages.indexOf(p)*2000+wait))
+      }, (pages.indexOf(p)*3000+wait))
     }
-    wait+=pages.length*2000;
+    wait+=pages.length*3000;
   }
 })().catch(e=>{throw e})
