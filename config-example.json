@@ -1,4 +1,9 @@
 {
-  "site": ["scp-sandbox-3", "wanderers-sandbox"],
-  "source": "./Wikidot/"
+  "site": ["scp-sandbox-3", "wanderers-sandbox", "scp-int-sandbox"],
+  "source": "./Wikidot/",
+  "pages": {
+    "scp-sandbox-3": "*",
+    "wanderers-sandbox": "eg1-wanderers-library",
+    "scp-int-sandbox": ["eg2-scp-int", "eg3-scp-int"]
+  }
 }

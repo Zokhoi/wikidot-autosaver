@@ -18,29 +18,40 @@
  ### Config
  Set up [config](./config-example.json) and rename as `config.json` with the following options:
 
- `site`: `Array` of `String` indicating what wikidot sites you are going to save to. <br/>
+ * `site`: `Array` of `String` indicating what wikidot sites you are going to save to. <br/>
  e.g. `["scp-sandbox-3", "wanderers-sandbox"]` means that you are going to save to `http://scp-sandbox-3.wikidot.com` and `http://wanderers-sandbox.wikidot.com`.
+ * `source`: `String` indicating the folder path where all your wikidot files are located.
+ * `pages`: `String` or `Array` of `String` indicating the pages you want to save to wikidot:
+  * `*` indicates you want to save all existing files in the under the site folder to wikidot;
+  * `"page-name"` indicates you want to save only the specified _page-name_ to wikidot;
+  * `["page-name-1", "page-name-2"]` indicates you want to save only _page-name-1_ and _page-name-2_ to wikidot.
 
- `source`: `String` indicating the folder path where all your wikidot files are located.
 
 ----
 ### Autosave Folder Structure
-The script auto-generates folders named with sites specified in the config in the folder specified source folder path. e.g.
+The script auto-generates folders named with sites specified in the config in the folder specified source folder path. <br />
+e.g. if you want to save to `scp-sandbox-3` pages named `a` and `b:c`, <br />
+`config.json`:
 ```JSON
 {
   "site": ["scp-sandbox-3", "wanderers-sandbox"],
-  "source": "D:/Wikidot/"
+  "source": "D:/Wikidot/",
+  "pages": {
+    "scp-sandbox-3": "*",
+    "wanderers-sandbox": "b~c"
+  }
 }
 ```
-And for example you want to save to `scp-sandbox-3` and `wanderers-sandbox` a page each named `a` and `b:c`,
-then the folder structure in `D:/Wikidot/` will be:
+Then the folder structure in `D:/Wikidot/` can be:
 ```
 .
 ├──scp-sandbox-3
 |   └──a.txt
 ├──wanderers-sandbox
-|   └──b~c.txt
+|   ├──b~c.txt
+|   └──d.txt
 ```
+And `d.txt` will not be saved to wikidot. <br />
 Note that colons are converted into tildes, as colons are forbidden symbols for file names in Windows.
 
 ----

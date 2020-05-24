@@ -2,8 +2,11 @@ const fs = require('fs');
 const path = require('path');
 const WD = require('./wd.js');
 var config = {
-  "site": ["scpsandboxcn"],
-  "source": "./Wikidot/"
+  "site": ["scp-sandbox-3"],
+  "source": "./Wikidot/",
+  "pages": {
+    "scp-sandbox-3": "*"
+  }
 }
 try {
   const cnfg = JSON.parse(fs.readFileSync('./config.json', 'utf-8'));
@@ -28,6 +31,13 @@ const wd = new WD(config.site.map(s=>`http://${s}.wikidot.com`));
   for (let s of dir) {
     let pages = fs.readdirSync(path.join(config.source,s))
                   .filter(f => fs.statSync(path.join(config.source,s,f)).isFile());
+    if (typeof config.pages[s] == "string") {
+      if (!config.pages[s] === "*") {
+        pages = pages.filter(f => f.split(".")[0]===config.pages[s])
+      }
+    } else if (config.pages[s] instanceof Array) {
+      pages = pages.filter(f => config.pages[s].includes(f.split(".")[0]));
+    }
     for (let p of pages) {
       let raw = fs.readFileSync(path.join(config.source,s,p), 'utf-8')
       let info = {
