@@ -15,13 +15,19 @@ try {
   if (!["ENOENT".includes(e.code)]) throw e
 }
 //const sGit = require('simple-git')(config.source);
+var lastModified = {};
+let lmpath = path.join(config.source, '.lastModified.json');
+if (fs.existsSync(lmpath)) {
+  lastModified = JSON.parse(fs.readFileSync(lmpath, 'utf-8'));
+} else {
+  fs.writeFileSync(path.join(config.source, '.lastModified.json'), '{}', 'utf-8');
+}
 
 let dir = fs.readdirSync(config.source)
             .filter(f => fs.statSync(path.join(config.source,f)).isDirectory()&&config.site.includes(f));
 for (let s of config.site) {
-  if (!dir.includes(s)) {
-    fs.mkdirSync(path.join(config.source, s));
-  }
+  if (!lastModified[s]) { lastModified[s] = {} }
+  if (!dir.includes(s)) { fs.mkdirSync(path.join(config.source, s)); }
 }
 const wd = new WD(config.site.map(s=>`http://${s}.wikidot.com`));
 
@@ -35,7 +41,11 @@ const wd = new WD(config.site.map(s=>`http://${s}.wikidot.com`));
   let wait = 0;
   for (let s of dir) {
     let pages = fs.readdirSync(path.join(config.source,s))
-                  .filter(f => fs.statSync(path.join(config.source,s,f)).isFile());
+                  .filter(f => {
+                    let stat = fs.statSync(path.join(config.source,s,f))
+                    return !!f.split(".")[0] && stat.isFile() &&
+                    (!lastModified[s][f] || stat.mtimeMs > lastModified[s][f])
+                  });
     if (typeof config.pages[s] == "string") {
       if (!config.pages[s] === "*") {
         pages = pages.filter(f => f.split(".")[0]===config.pages[s])
@@ -44,7 +54,8 @@ const wd = new WD(config.site.map(s=>`http://${s}.wikidot.com`));
       pages = pages.filter(f => config.pages[s].includes(f.split(".")[0]));
     }
     for (let p of pages) {
-      let raw = fs.readFileSync(path.join(config.source,s,p), 'utf-8')
+      let raw = fs.readFileSync(path.join(config.source,s,p), 'utf-8');
+      lastModified[s][p] = fs.statSync(path.join(config.source,s,p)).mtimeMs;
       let info = {
         title: "",
         source: "",
@@ -89,4 +100,6 @@ const wd = new WD(config.site.map(s=>`http://${s}.wikidot.com`));
     }
     wait+=pages.length*3000;
   }
+  fs.writeFileSync(lmpath,
+    JSON.stringify(lastModified, null, 2), 'utf-8');
 })().catch(e=>{throw e})
