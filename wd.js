@@ -5,6 +5,7 @@ class Site {
     this.wiki(base);
   }
   wiki(base) {
+    if (!base.startsWith("http")) { base = `http://${base}.wikidot.com` }
     this.base = `${base}/ajax-module-connector.php`;
     return this;
   }
