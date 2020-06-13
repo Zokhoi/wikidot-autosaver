@@ -90,7 +90,7 @@ const wd = new WD(config.site);
         wd.edit(s, p.replace(/~/g,':').split(".")[0], info)
           .catch(e=>{
           err = e
-          if (!e.message==="Response code 500 (Internal Server Error)") throw e
+          if (!e.message==="Response code 500 (Internal Server Error)") {console.log(e.message)}
         })
         if (!err) {
           console.log(`Successfully posted to http://${s}.wikidot.com/${p.replace(/~/g,':').split(".")[0]}`);
