@@ -6,12 +6,15 @@
   "scripts": {
     "start": "node index.js"
   },
-  "keywords": ["wikidot", "autosave"],
+  "keywords": [
+    "wikidot",
+    "autosave"
+  ],
   "author": "Joch2520",
   "repository": "github:joch2520/wikidot-autosaver",
   "license": "MIT",
   "dependencies": {
-    "got": "^11.1.4",
+    "got": "^11.3.0",
     "readline-sync": "^1.4.10"
   }
 }

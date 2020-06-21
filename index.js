@@ -20,7 +20,7 @@ let lmpath = path.join(config.source, '.lastModified.json');
 if (fs.existsSync(lmpath)) {
   lastModified = JSON.parse(fs.readFileSync(lmpath, 'utf-8'));
 } else {
-  fs.writeFileSync(path.join(config.source, '.lastModified.json'), '{}', 'utf-8');
+  fs.writeFileSync(lmpath, '{}', 'utf-8');
 }
 
 let dir = fs.readdirSync(config.source)
