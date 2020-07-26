@@ -47,7 +47,7 @@ const wd = new WD(config.site);
                     (!lastModified[s][f] || stat.mtimeMs > lastModified[s][f])
                   });
     if (typeof config.pages[s] == "string") {
-      if (!config.pages[s] === "*") {
+      if (config.pages[s] !== "*") {
         pages = pages.filter(f => f.split(".")[0]===config.pages[s])
       }
     } else if (config.pages[s] instanceof Array) {
