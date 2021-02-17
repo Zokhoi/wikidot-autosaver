@@ -60,10 +60,11 @@ The file that you save should be of the following structure:
 ```
 title: (your title here)
 tags: (tags here)
+parent: (full parent page name here)
 comments: (revision comments here)
 (another line of comments here)
 ~~~~~~
 (your page source here)
 ```
-Any of title, tags and comment are optional but are suggested to be kept even if they are empty.
-Title and tags only accept one line, any other lines will be treated as revision comments.
+Any of title, tags, parent and comment are optional but are suggested to be kept even if they are empty, for your own ease.
+Title, tags and parent only accept one line, any other lines will be treated as revision comments.

@@ -60,7 +60,8 @@ const wd = new WD(config.site);
         title: "",
         source: "",
         comments: "",
-        tags: ""
+        tags: "",
+        parentPage: "",
       }
       let sauce = raw.split("~~~~~~");
       if (sauce.length===1) {
@@ -82,6 +83,9 @@ const wd = new WD(config.site);
             placeholder.splice(placeholder.indexOf(ln), 1)
             placeholder.unshift(ln.substring("comments:".length).split(" ").filter(v=>!!v).join(" "))
             info.comments = placeholder.join("\n");
+          } else if (ln.toLowerCase().startsWith("parent")) {
+            placeholder.splice(placeholder.indexOf(ln), 1)
+            info.parentPage = ln.substring("parent:".length).split(" ").filter(v=>!!v).join(" ").trim()
           }
         }
       }
