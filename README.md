@@ -16,7 +16,7 @@
 
  ----
  ### Config
- Set up [config](./config-example.json) and rename as `config.json` with the following options:
+ Set up [config.yml](./config-example.yml) or [config.json](./config-example.json) and rename as `config.yml` or `config.json` with the following options:
 
  * `site`: `Array` of `String` indicating what wikidot sites you are going to save to. <br/>
  e.g. `["scp-sandbox-3", "wanderers-sandbox"]` means that you are going to save to `http://scp-sandbox-3.wikidot.com` and `http://wanderers-sandbox.wikidot.com`.
@@ -31,7 +31,17 @@
 ### Autosave Folder Structure
 The script auto-generates folders named with sites specified in the config in the folder specified source folder path. <br />
 e.g. if you want to save to `scp-sandbox-3` pages named `a` and `b:c`, <br />
-`config.json`:
+`config.yml`:
+```YAML
+site:
+  - "scp-sandbox-3"
+  - "wanderers-sandbox"
+source: "D:/Wikidot/"
+pages:
+  scp-sandbox-3: "*"
+  wanderers-sandbox: "b~c"
+```
+or equivalently `config.json`:
 ```JSON
 {
   "site": ["scp-sandbox-3", "wanderers-sandbox"],
@@ -55,14 +65,14 @@ And `d.txt` will not be saved to wikidot. <br />
 Note that colons are converted into tildes, as colons are forbidden symbols for file names in Windows.
 
 ----
-### File Structure
-The file that you save should be of the following structure:
+### File Content Structure
+The file that you save should be of the following content structure:
 ```
 title: (your title here)
 tags: (tags here)
 parent: (full parent page name here)
-comments: (revision comments here)
-(another line of comments here)
+comments: (revision comment here)
+(another line of comment here)
 ~~~~~~
 (your page source here)
 ```

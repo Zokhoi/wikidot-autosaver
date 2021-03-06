@@ -1,6 +1,15 @@
 const fs = require('fs');
 const path = require('path');
+const yaml = require('js-yaml');
 const WD = require('./wd.js');
+const isFileExists = (name) => {
+  try {
+      fs.accessSync(name, fs.constants.R_OK);
+      return true;
+  } catch (err) {
+      return false;
+  }
+}
 var config = {
   "site": ["scp-sandbox-3"],
   "source": "./Wikidot/",
@@ -8,11 +17,14 @@ var config = {
     "scp-sandbox-3": "*"
   }
 }
-try {
-  const cnfg = JSON.parse(fs.readFileSync('./config.json', 'utf-8'));
-  config = Object.assign(config, cnfg);
-} catch (e) {
-  if (!["ENOENT"].includes(e.code)) throw e
+if (isFileExists(`config.yml`)) {
+  config = yaml.load(fs.readFileSync(`config.yml`, 'utf8'));
+} else if (isFileExists(`config.yaml`)) {
+  config = yaml.load(fs.readFileSync(`config.yaml`, 'utf8'));
+} else if (isFileExists(`config.js`)) {
+  config = require(`./config.js`);
+} else if (isFileExists(`config.json`)) {
+  config = require(`./config.json`);
 }
 //const sGit = require('simple-git')(config.source);
 var lastModified = {};
@@ -63,11 +75,11 @@ const wd = new WD(config.site);
         tags: "",
         parentPage: "",
       }
-      let sauce = raw.split("~~~~~~");
+      let sauce = raw.split(/~{4,}/);
       if (sauce.length===1) {
         info.source = raw;
       } else {
-        let metadata = raw.split("~~~~~~")[0].split("\n").filter(v=>!!v);
+        let metadata = raw.split(/~{4,}/)[0].split("\n").filter(v=>!!v);
         let placeholder = JSON.parse(JSON.stringify(metadata));
         sauce.shift();
         sauce.join("~~~~~~").split("\n").shift();

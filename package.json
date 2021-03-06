@@ -15,6 +15,7 @@
   "license": "MIT",
   "dependencies": {
     "got": "^11.3.0",
+    "js-yaml": "^4.0.0",
     "readline-sync": "^1.4.10"
   }
 }
