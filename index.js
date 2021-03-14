@@ -56,14 +56,14 @@ const wd = new WD(config.site);
                   .filter(f => {
                     let stat = fs.statSync(path.join(config.source,s,f))
                     return !!f.split(".")[0] && stat.isFile() &&
-                    (!lastModified[s][f] || stat.mtimeMs > lastModified[s][f])
+                    (!lastModified[s][f.replace(/~/g,':')] || stat.mtimeMs > lastModified[s][f.replace(/~/g,':')])
                   });
     if (typeof config.pages[s] == "string") {
       if (config.pages[s] !== "*") {
-        pages = pages.filter(f => f.split(".")[0]===config.pages[s])
+        pages = pages.filter(f => [f.split(".")[0], f.split(".")[0].replace(/~/g,':')].includes(config.pages[s]))
       }
     } else if (config.pages[s] instanceof Array) {
-      pages = pages.filter(f => config.pages[s].includes(f.split(".")[0]));
+      pages = pages.filter(f => config.pages[s].includes(f.split(".")[0]) || config.pages[s].includes(f.split(".")[0].replace(/~/g,':')));
     }
     for (let p of pages) {
       let raw = fs.readFileSync(path.join(config.source,s,p), 'utf-8');
