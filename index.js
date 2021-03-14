@@ -97,7 +97,7 @@ const wd = new WD(config.site);
             info.comments = placeholder.join("\n");
           } else if (ln.toLowerCase().startsWith("parent")) {
             placeholder.splice(placeholder.indexOf(ln), 1)
-            info.parentPage = ln.substring("parent:".length).split(" ").filter(v=>!!v).join(" ").trim()
+            info.parentPage = ln.substring("parent:".length).split(" ").filter(v=>!!v).join(" ").trim().replace(/~/g,':')
           }
         }
       }
