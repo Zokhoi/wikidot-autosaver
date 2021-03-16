@@ -76,14 +76,22 @@ const wd = new WD(config.site);
         parentPage: "",
       }
       let sauce = raw.split(/~{4,}/);
+      let tilde = raw.match(/~{4,}/gi);
+      tilde.shift();
+      let tmp = [];
       if (sauce.length===1) {
         info.source = raw;
       } else {
-        let metadata = raw.split(/~{4,}/)[0].split("\n").filter(v=>!!v);
+        let metadata = sauce.shift().split("\n").filter(v=>!!v);
         let placeholder = JSON.parse(JSON.stringify(metadata));
+        for (let i = 0; i < sauce.length; i++) {
+          if (sauce[i]) tmp.push(sauce[i]);
+          if (tilde[i]) tmp.push(tilde[i]);
+        }
+        sauce = tmp.join("").split("\n");
         sauce.shift();
-        sauce.join("~~~~~~").split("\n").shift();
         info.source = sauce.join("\n");
+        console.log(info.source)
         for (let ln of metadata) {
           if (ln.toLowerCase().startsWith("title")) {
             placeholder.splice(placeholder.indexOf(ln), 1)
