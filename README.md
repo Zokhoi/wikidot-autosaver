@@ -30,7 +30,7 @@
 ----
 ### Autosave Folder Structure
 The script auto-generates folders named with sites specified in the config in the folder specified source folder path. <br />
-e.g. if you want to save to `scp-sandbox-3` pages named `a` and `b:c`, <br />
+e.g. if you want to save to `scp-sandbox-3` page `a`, and to `wanderers-sandbox` pages `b:c` and `e`, <br />
 `config.yml`:
 ```YAML
 site:
@@ -39,7 +39,9 @@ site:
 source: "D:/Wikidot/"
 pages:
   scp-sandbox-3: "*"
-  wanderers-sandbox: "b~c"
+  wanderers-sandbox:
+    - "b~c"
+    - "e"
 ```
 or equivalently `config.json`:
 ```JSON
@@ -48,7 +50,10 @@ or equivalently `config.json`:
   "source": "D:/Wikidot/",
   "pages": {
     "scp-sandbox-3": "*",
-    "wanderers-sandbox": "b~c"
+    "wanderers-sandbox": [
+      "b~c",
+      "e"
+    ]
   }
 }
 ```
@@ -59,7 +64,8 @@ Then the folder structure in `D:/Wikidot/` can be:
 |   └──a.txt
 ├──wanderers-sandbox
 |   ├──b~c.txt
-|   └──d.txt
+|   ├──d.txt
+|   └──e.txt
 ```
 And `d.txt` will not be saved to wikidot. <br />
 Note that colons are converted into tildes, as colons are forbidden symbols for file names in Windows.
