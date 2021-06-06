@@ -91,7 +91,6 @@ const wd = new WD(config.site);
         sauce = tmp.join("").split("\n");
         sauce.shift();
         info.source = sauce.join("\n");
-        console.log(info.source)
         for (let ln of metadata) {
           if (ln.toLowerCase().startsWith("title")) {
             placeholder.splice(placeholder.indexOf(ln), 1)
