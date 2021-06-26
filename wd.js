@@ -13,7 +13,11 @@ class Site {
   async req(cookies, params) {
       const wikidotToken7 = Math.random().toString(36).substring(4);
       return await got.post(this.base, {
-        headers: {Cookie: `${cookies.auth}wikidot_token7=${wikidotToken7}`},
+        headers: {
+          'User-Agent': 'wikidot autosaver',
+          Referer: 'wikidot autosaver',
+          Cookie: `${cookies.auth}wikidot_token7=${wikidotToken7}`
+        },
         form: Object.assign({wikidot_token7: wikidotToken7, callbackIndex: 0}, params)
       }).json();
   };
