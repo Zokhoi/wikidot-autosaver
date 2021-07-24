@@ -9,40 +9,6 @@ class Site {
     this.base = `${base}/ajax-module-connector.php`;
     return this;
   }
-
-  async req(cookies, params) {
-      const wikidotToken7 = Math.random().toString(36).substring(4);
-      return await got.post(this.base, {
-        headers: {
-          'User-Agent': 'wikidot autosaver',
-          Referer: 'wikidot autosaver',
-          Cookie: `${cookies.auth}wikidot_token7=${wikidotToken7}`
-        },
-        form: Object.assign({wikidot_token7: wikidotToken7, callbackIndex: 0}, params)
-      }).json();
-  };
-
-  async module(cookies, moduleName, params) {
-    return await this.req(cookies, Object.assign({moduleName: moduleName},params))
-  };
-
-  async action(cookies, action, params) {
-    return await this.req(cookies, Object.assign({action: action, moduleName: "Empty"},params))
-  };
-
-  async edit(cookies, wiki_page, params) {
-    var lock = await this.module(cookies, 'edit/PageEditModule', {
-            mode: 'page',
-            wiki_page: wiki_page,
-            force_lock: true})
-    return await this.action(cookies, 'WikiPageAction', Object.assign({
-      event: 'savePage',
-      wiki_page: wiki_page,
-      lock_id: lock.lock_id,
-      lock_secret: lock.lock_secret,
-      revision_id: lock.page_revision_id||null,
-    }, params))
-  }
 }
 
 module.exports = class WD {
@@ -59,6 +25,27 @@ module.exports = class WD {
   }
   setCookies(v) { Object.assign(this.cookie, v) }
 
+  async req(base, params={}) {
+      const wikidotToken7 = Math.random().toString(36).substring(4);
+      return await got.post(base, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0',
+          // 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+          Referer: 'wikidot autosaver',
+          Cookie: `wikidot_token7=${wikidotToken7}; ${this.cookie.auth}`,
+        },
+        form: Object.assign({wikidot_token7: wikidotToken7, callbackIndex: 0}, params)
+      }).json();
+  };
+
+  async module(base, moduleName, params={}) {
+    return await this.req(base, Object.assign({moduleName: moduleName},params))
+  };
+
+  async action(base, action, params={}) {
+    return await this.req(base, Object.assign({action: action, moduleName: "Empty"},params))
+  };
+
   async askLogin() {
     let un = null, pw = null;
     while (!un) {
@@ -73,7 +60,11 @@ module.exports = class WD {
   async login(username, password) {
     const wikidotToken7 = Math.random().toString(36).substring(4);
     let res = await got.post('https://www.wikidot.com/default--flow/login__LoginPopupScreen', {
-      headers: {Cookie: `wikidot_token7=${wikidotToken7}`},
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0',
+        Referer: 'wikidot autosaver',
+        Cookie: `wikidot_token7=${wikidotToken7}`
+      },
       form: {
 				login: username,
 				password: password,
@@ -82,16 +73,32 @@ module.exports = class WD {
         wikidot_token7: wikidotToken7,
         callbackIndex: 0
 			}
-			})
+		})
     if (res.body.includes("The login and password do not match.")) {throw new Error("The login and password do not match.")}
     let tmp = res.headers['set-cookie'][1].split("; ")
   	this.cookie.sess = tmp[0]
   	this.cookie.expire = tmp[1].split("=")[1]
-    this.cookie.auth = `${this.cookie.sess}; wikidot_udsession=1; `
+    this.cookie.auth = `${this.cookie.sess}; wikidot_udsession=1`
     return this;
   }
 
-  async edit(site, wiki_page, params) {
-    return await this.bases.get(site).edit(this.cookie, wiki_page, params);
+  async edit(site, wiki_page, params={}) {
+    let base = this.bases.get(site)==undefined ? site : this.bases.get(site).base ;
+    var lock = await this.module(base, 'edit/PageEditModule', {
+            mode: 'page',
+            wiki_page: wiki_page,
+            force_lock: true})
+    if (lock.status!='ok') {
+      let e = new Error(lock.message);
+      e.code = lock.status;
+      throw e;
+    }
+    return await this.action(base, 'WikiPageAction', Object.assign({
+      event: 'savePage',
+      wiki_page: wiki_page,
+      lock_id: lock.lock_id,
+      lock_secret: lock.lock_secret,
+      revision_id: lock.page_revision_id||null,
+    }, params))
   }
 }
