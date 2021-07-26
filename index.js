@@ -108,16 +108,19 @@ const wd = new WD(config.site);
           }
         }
       }
-      setTimeout(()=>{
+      setTimeout(async ()=>{
         let err = null;
         wd.edit(s, p.replace(/~/g,':').split(".")[0], info)
           .catch(e=>{
           err = e;
-          if (e.message!="Response code 500 (Internal Server Error)") {console.log(e.message)}
+          if (e.message!="Response code 500 (Internal Server Error)") {
+            console.log(`Error at editing :${s}:${p.replace(/~/g,':').split(".")[0]} : ${JSON.stringify(e.src,null,2)}`)
+          }
+        }).finally(()=>{
+          if (!err) {
+            console.log(`Successfully posted to http://${s}.wikidot.com/${p.replace(/~/g,':').split(".")[0]}`);
+          }
         })
-        if (!err) {
-          console.log(`Successfully posted to http://${s}.wikidot.com/${p.replace(/~/g,':').split(".")[0]}`);
-        }
       }, (pages.indexOf(p)*3000+wait))
     }
     wait+=pages.length*3000;

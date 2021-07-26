@@ -27,7 +27,7 @@ module.exports = class WD {
 
   async req(base, params={}) {
       const wikidotToken7 = Math.random().toString(36).substring(4);
-      return await got.post(base, {
+      let res = await got.post(base, {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0',
           // 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
@@ -36,6 +36,12 @@ module.exports = class WD {
         },
         form: Object.assign({wikidot_token7: wikidotToken7, callbackIndex: 0}, params)
       }).json();
+      if (res.status!='ok') {
+        let e = new Error(res.message);
+        e.status = res.status;
+        e.src = res;
+        throw e;
+      } else return res;
   };
 
   async module(base, moduleName, params={}) {
@@ -90,7 +96,8 @@ module.exports = class WD {
             force_lock: true})
     if (lock.status!='ok') {
       let e = new Error(lock.message);
-      e.code = lock.status;
+      e.status = lock.status;
+      e.src = lock;
       throw e;
     }
     return await this.action(base, 'WikiPageAction', Object.assign({
