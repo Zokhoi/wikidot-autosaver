@@ -7,7 +7,7 @@ body {
   height: 100vh;
   width: 100vw;
   color: #e0e0e0;
-  background: #272727;
+  background: #222;
   font-family: sans-serif;
   overflow-y: hidden;
   display: block;
@@ -39,6 +39,11 @@ ul {
   padding: 0;
 }
 
+ol {
+  margin: 0;
+  padding: 0;
+}
+
 .tab-bar {
   background-color: #333;
   height: 30px;
@@ -59,7 +64,11 @@ ul {
   width: 0;
   height: 4px;
   display: none;
+  position: absolute;
+  bottom: 0;
+  background: none;
 }
+.tab-bar:hover::-webkit-scrollbar,
 .tab-bar:hover ::-webkit-scrollbar {
   display: block;
 }
@@ -69,11 +78,11 @@ ul {
 }
 .tab-bar::-webkit-scrollbar-track,
 .tab-bar ::-webkit-scrollbar-track {
-  background-color: transparent;
+  background: none;
 }
 .tab-bar::-webkit-scrollbar-track-piece,
 .tab-bar ::-webkit-scrollbar-track-piece {
-  background-color: transparent;
+  display: none;
 }
 .tab-bar::-webkit-scrollbar-thumb,
 .tab-bar ::-webkit-scrollbar-thumb {
@@ -87,11 +96,10 @@ ul {
 
 .tab-bar li {
   margin: 0;
-  padding: 2px;
   padding-inline: 1em;
   max-width: fit-content;
-  height: 22px;
-  max-height: 22px;
+  height: 30px;
+  max-height: 30px;
   display: inline-block;
   user-select: none;
   -webkit-user-select: none;
@@ -99,7 +107,7 @@ ul {
 }
 
 .tab-bar li.active {
-  background-color: #272727;
+  background-color: #222;
 }
 
 .tab-bar li a.tab-close {
@@ -188,6 +196,7 @@ a:hover {
   height: 50px;
   /* border-color: #737475; */
   color: #999999;
+  cursor: pointer;
 
   display: flex;
   justify-content: center;
@@ -300,22 +309,35 @@ a:hover {
   width: 100%;
 }
 
+.file-list::-webkit-scrollbar{
+  width: 13px;
+}
 .cm-scroller::-webkit-scrollbar {
   width: 13px;
   border-left: 1px solid #333;
+  border-top: 1px solid #333;
 }
-.cm-scroller::-webkit-scrollbar-button {
+.file-list::-webkit-scrollbar-button,
+.cm-scroller::-webkit-scrollbar-button,
+.cm-scroller::-webkit-scrollbar-corner {
   display: none;
 }
+.file-list::-webkit-scrollbar-track-piece,
 .cm-scroller::-webkit-scrollbar-track-piece {
   background-color: transparent;
 }
+.file-list::-webkit-scrollbar-thumb,
 .cm-scroller::-webkit-scrollbar-thumb {
-  background-color: #6660;
+  background-color: #fff0;
 }
+.file-list:hover::-webkit-scrollbar-thumb,
 .cm-container:hover .cm-scroller::-webkit-scrollbar-thumb,
 .cm-container .cm-scroller:hover::-webkit-scrollbar-thumb {
-  background-color: #6666;
+  background-color: #fff3;
+}
+.file-list::-webkit-scrollbar-thumb:hover,
+.cm-container .cm-scroller::-webkit-scrollbar-thumb:hover {
+  background-color: #fff6;
 }
 
 @keyframes fadeBg {
@@ -324,11 +346,119 @@ a:hover {
 }
 
 .mainpane {
-  display: none;
+  display: inline-block;
   width: calc(100% - 50px);
   height: 100%;
 }
 
-.mainpane.active {
+.sidepane {
+  display: none;
+  width: 300px;
+  background-color: #2a2a2a;
+}
+
+.sidepane.active {
   display: inline-block;
+}
+
+.side-tab.active {
+  display: inline-block;
+}
+
+.side-tab {
+  display: none;
+}
+
+.sidepane.active ~ .mainpane {
+  width: calc(100% - 350px)
+}
+
+.sidepane .dir-container {
+  font-size: 13.5px;
+  overflow: auto;
+  width: 100%;
+  height: 100%;
+}
+
+.sidepane .file-list,
+.sidepane .file-list .file-item {
+  word-break: keep-all;
+  overflow-wrap: normal;
+  overflow: hidden;
+}
+
+.sidepane .file-list {
+  height: 100%;
+}
+
+.dir-container > .file-list {
+  overflow: auto;
+  padding-left: 20px;
+  padding-block: 10px;
+  width: calc(100% - 20px);
+  height: calc(100% - 20px);
+}
+
+.dir-container .collapsible-container.fold > .file-list {
+  display: none;
+}
+.dir-container .collapsible-container > .collapsible-anchor > .collapsible-logo {
+  display: inline-block;
+  width: 17px;
+}
+.dir-container .collapsible-container > .collapsible-anchor > .collapsible-logo > svg {
+  display: none;
+}
+.dir-container .collapsible-container.show > .collapsible-anchor > .collapsible-logo > svg.show,
+.dir-container .collapsible-container.fold > .collapsible-anchor > .collapsible-logo > svg.fold {
+  display: inline;
+}
+.dir-container .collapsible-container.show > .file-list {
+  display: block;
+}
+
+.sidepane .file-list .file-item {
+  cursor: pointer;
+  /* margin: 1px;
+  width: calc(100% - 2px); */
+  width: 100%;
+}
+
+.dir-container .collapsible-anchor {
+  cursor: pointer;
+}
+
+.sidepane .file-list .file-item.active {
+  background-color: #434343;
+}
+
+.sidepane .file-list .file-item:hover,
+.sidepane .file-list .collapsible-anchor:hover {
+  background-color: #43434355;
+  /* outline: 1px solid #434343; */
+}
+.sidepane .file-list .file-item:focus:hover {
+  background-color: #43434355;
+  outline: #007fd4 1px solid;
+}
+
+.side-tab,
+.DirectoryPane {
+  width: 100%;
+  height: 100%;
+}
+
+
+.DirectoryPane {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+:focus {
+  outline: #007fd4 1px solid;
+}
+
+.cm-scroller:focus,
+.cm-scroller:focus-within {
+  outline: none;
 }

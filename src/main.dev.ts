@@ -11,11 +11,13 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain, dialog } from 'electron';
+import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import Store from 'electron-store';
 import electronLocalShortcut from 'electron-localshortcut';
+import { statSync } from 'fs';
+import { isAbsolute } from 'path';
 import MenuBuilder from './menu';
 
 export default class AppUpdater {
@@ -35,7 +37,9 @@ if (process.env.NODE_ENV === 'production') {
 
 if (
   process.env.NODE_ENV === 'development' ||
-  process.env.DEBUG_PROD === 'true'
+  process.env.DEBUG_PROD === 'true' ||
+  process.argv.includes('--debug') ||
+  process.argv.includes('-d')
 ) {
   require('electron-debug')();
 }
@@ -59,10 +63,17 @@ const schema: Record<string, unknown> = {
       default: 0,
     },
   },
+  workspaces: {
+    type: 'string',
+    default: '',
+  },
 };
 
 const store = new Store(schema);
 const prevBounds: Record<string, number> = store.get('windowBounds');
+const workspaces: string = store.get('workspaces');
+
+const appName = app.getName();
 
 const installExtensions = async () => {
   const installer = require('electron-devtools-installer');
@@ -106,25 +117,14 @@ const createWindow = async () => {
       nodeIntegration: true,
       enableRemoteModule: true,
     },
-    frame: false,
+    frame: process.platform !== 'win32',
   });
 
   mainWindow.loadURL(`file://${__dirname}/index.html`);
-  electronLocalShortcut.register(mainWindow, 'Ctrl+O', () => {
-    const files = dialog.showOpenDialogSync(mainWindow, {
-      filters: [
-        {
-          name: 'FTML files',
-          extensions: ['wd', 'wj', 'wikidot', 'wikijump', 'ftml'],
-        },
-        { name: 'All Files', extensions: ['*'] },
-      ],
-      properties: ['openFile', 'multiSelections'],
-    });
-    if (files) {
-      mainWindow?.webContents.send('fileOpen', files);
-    }
-  });
+
+  // electronLocalShortcut.register(mainWindow, 'CmdOrCtrl+W', () => {
+  //   mainWindow?.webContents.send('closeCurrentTab');
+  // });
 
   // @TODO: Use 'ready-to-show' event
   //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
@@ -140,6 +140,24 @@ const createWindow = async () => {
     } else {
       mainWindow.show();
       mainWindow.focus();
+    }
+    if (app.isPackaged && process.argv.length > 1) {
+      const last = [...process.argv].pop()!;
+      if (isAbsolute(last)) {
+        const stat = statSync(last);
+        if (stat.isDirectory()) {
+          mainWindow.webContents.send('dirOpen', last);
+          mainWindow.webContents.send('dirInit');
+        } else if (stat.isFile()) {
+          mainWindow.webContents.send('fileOpen', [last]);
+        }
+      } else {
+        mainWindow.webContents.send('dirInit');
+        mainWindow.webContents.send('dirOpen', workspaces ?? '');
+      }
+    } else {
+      mainWindow.webContents.send('dirInit');
+      mainWindow.webContents.send('dirOpen', workspaces ?? '');
     }
   });
 
@@ -157,6 +175,14 @@ const createWindow = async () => {
 
   ipcMain.on('WindowClose', () => {
     mainWindow?.close();
+  });
+
+  // forward events between contents
+  ipcMain.on('fileUse', (_event, ...props) => {
+    mainWindow?.webContents.send('fileUse', ...props);
+  });
+  ipcMain.on('fileActive', (_event, ...props) => {
+    mainWindow?.webContents.send('fileActive', ...props);
   });
 
   mainWindow.on('resize', () => {

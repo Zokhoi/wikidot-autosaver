@@ -6,6 +6,9 @@ let packagePath = join(root, "/package-wj")
 let clientPath = 'client/'
 let modulePath = join(clientPath, 'modules/')
 
+let tsModulePaths = require(join(root, 'tsconfig.json')).compilerOptions.paths
+tsModulePaths = JSON.parse(JSON.stringify(tsModulePaths).replace(/package-wj\/client\//g, ''));
+
 class Dir {
   constructor(name) {
     this.name = name;
@@ -49,23 +52,22 @@ function run(cmd, args, wd = root, { shell = false } = {}) {
 function install(arg = null) {
   let origin = arg == "--ssh" ? "git@github.com:scpwiki/wikijump.git" : "https://github.com/scpwiki/wikijump.git"
   if (!fs.existsSync(packagePath)) {
-    run("git", ["clone", "--depth=1", "--filter=blob:none", "--sparse", origin, packagePath])
-    run("git", ["sparse-checkout", "set", clientPath], packagePath)
+    run("git", ["clone", "--depth=1", "--filter=blob:none", origin, packagePath])
+    // run("git", ["sparse-checkout", "set", clientPath], packagePath)
     run("git", ["pull", "--depth=1", "origin", "develop"], packagePath)
   }
+
+  const relTsModulePath = join(packagePath, clientPath, 'tsconfig.json')
+  let relTsModule = require(relTsModulePath)
+  relTsModule.compilerOptions.paths = {...relTsModule.compilerOptions.paths, ...tsModulePaths}
+  fs.writeFileSync(relTsModulePath, JSON.stringify(relTsModule, null, 2), 'utf8')
+
+
 
   // const pnpm = `packages
   //   - 'modules/*`
 
   // fs.writeFileSync(join(packagePath, 'client/pnpm-workspace.yaml'), pnpm, 'utf8')
-
-  for (let pkg of packages) {
-    if (fs.existsSync(pkg.dir)) {
-      run("yarn.cmd", ["install"], pkg.dir)
-    } else {
-      console.warn(`Skipping installing for ${pkg.name} (directory does not exist)`)
-    }
-  }
 }
 
 

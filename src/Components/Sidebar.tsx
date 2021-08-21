@@ -1,41 +1,42 @@
 import React from 'react';
-import { div } from 'react-router-dom';
+import { ipcRenderer } from 'electron';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome, faFolderOpen, faEdit, faCog } from '@fortawesome/free-solid-svg-icons';
+import {
+  // faHome,
+  faFolderOpen,
+  // faEdit,
+  faCog,
+} from '@fortawesome/free-solid-svg-icons';
 // import SCPIcon from '../../assets/scp-wiki';
 
 class Sidebar extends React.Component {
-  switcher: Function;
-
   constructor(props) {
     super(props);
-    this.switcher = props.switcher;
     this.state = {
-      pane: 'home',
-      history: '/',
+      pane: '',
     };
+    ipcRenderer.on('dirInit', () => {
+      this.setState({ pane: 'folder' });
+    });
+    ipcRenderer.on('dirOpen', () => {
+      this.setState({ pane: 'folder' });
+    });
+  }
+
+  switcher(pane: string) {
+    this.setState({ pane: this.state.pane === pane ? '' : pane });
+    this.props.switcher(pane);
   }
 
   render() {
-    const { pane, history } = this.state;
+    const { pane } = this.state;
 
     return (
       <div className="side-container">
         <a
           role="menuitem"
-          className={`side-item icon ${pane === 'home' && 'active'}`}
-          onClick={() => {
-            this.setState({ pane: 'home' });
-            this.switcher('home');
-          }}
-        >
-          <FontAwesomeIcon icon={faHome} />
-        </a>
-        <a
-          role="menuitem"
           className={`side-item icon ${pane === 'folder' && 'active'}`}
           onClick={() => {
-            this.setState({ pane: 'folder' });
             this.switcher('folder');
           }}
         >
@@ -43,19 +44,8 @@ class Sidebar extends React.Component {
         </a>
         <a
           role="menuitem"
-          className={`side-item icon ${pane === 'edit' && 'active'}`}
-          onClick={() => {
-            this.setState({ pane: 'edit' });
-            this.switcher('edit');
-          }}
-        >
-          <FontAwesomeIcon icon={faEdit} />
-        </a>
-        <a
-          role="menuitem"
           className={`side-item icon ${pane === 'settings' && 'active'}`}
           onClick={() => {
-            this.setState({ pane: 'settings' });
             this.switcher('settings');
           }}
         >

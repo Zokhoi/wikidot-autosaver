@@ -34,7 +34,7 @@ const CMDark = EditorView.theme(
       backgroundColor: 'transparent',
       borderTop: '#3f3f3faa 2px solid',
       borderBottom: '#3f3f3faa 2px solid',
-    },
+    }
   },
   { dark: true }
 );

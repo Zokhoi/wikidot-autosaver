@@ -1,4 +1,4 @@
-import React from 'React';
+import React from 'react';
 
 const VerticalRule = () => {
   return <div className="rule vertical" />;

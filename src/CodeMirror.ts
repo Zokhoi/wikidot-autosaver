@@ -63,11 +63,8 @@ export {
   cursorSyntaxLeft,
   cursorSyntaxRight,
   defaultKeymap,
-  defaultTabBinding,
   deleteCharBackward,
   deleteCharForward,
-  deleteCodePointBackward,
-  deleteCodePointForward,
   deleteGroupBackward,
   deleteGroupForward,
   deleteLine,
@@ -78,6 +75,7 @@ export {
   indentLess,
   indentMore,
   indentSelection,
+  indentWithTab,
   insertNewline,
   insertNewlineAndIndent,
   insertTab,
@@ -176,12 +174,12 @@ export {
 } from '@codemirror/history';
 
 export {
-  EditorParseContext,
+  ParseContext as EditorParseContext,
   IndentContext,
   Language,
   LanguageDescription,
   LanguageSupport,
-  LezerLanguage,
+  LRLanguage as LezerLanguage,
   TreeIndentContext,
   continuedIndent,
   defineLanguageFacet,
@@ -336,3 +334,7 @@ export type {
 export { css, cssCompletion, cssLanguage } from '@codemirror/lang-css';
 
 export { html, htmlCompletion, htmlLanguage } from '@codemirror/lang-html';
+
+export { TarnationLanguage } from '@shuen/cm-tarnation';
+
+// export { FTMLLanguage } from 'cm-lang-ftml';

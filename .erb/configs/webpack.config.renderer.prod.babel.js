@@ -120,6 +120,29 @@ export default merge(baseConfig, {
         test: /\.(?:ico|gif|png|jpg|jpeg|webp)$/,
         use: 'url-loader',
       },
+      // Svelte components
+      {
+        test: /\.(html|svelte)$/,
+        use: 'svelte-loader'
+      },
+      {
+        // required to prevent errors from Svelte on Webpack 5+, omit on Webpack 4
+        test: /node_modules\/svelte\/.*\.mjs$/,
+        resolve: {
+          fullySpecified: false
+        }
+      },
+      // Yaml
+      {
+        test: /\.ya?ml$/,
+        type: 'json', // Required by Webpack v4
+        use: 'yaml-loader'
+      },
+      // Toml
+      {
+        test: /\.toml$/,
+        use: 'toml-loader'
+      }
     ],
   },
 

@@ -1,15 +1,14 @@
 import React from 'react';
 
 export default class Footer extends React.Component {
-  constructor(props) {
+  constructor(props: { cursor: string }) {
     super(props);
-    this.state = {};
   }
 
   render() {
     return (
       <div className="footer">
-        <span>this is where footer will go</span>
+        <span>{this.props.cursor}</span>
       </div>
     );
   }

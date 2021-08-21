@@ -4,6 +4,11 @@ import { readFileSync } from 'fs';
 import { basename } from 'path';
 import Editor from './Editor';
 
+interface TabInfo {
+  id: string;
+  name: string;
+}
+
 export default class TabbedPane extends React.Component {
   pane: HTMLElement | null = null;
 
@@ -17,11 +22,8 @@ export default class TabbedPane extends React.Component {
       tabs: props.tabs || [],
       activeTab: active || '',
     };
-    ipcRenderer.on('fileOpen', (event, files: string[]) => {
-      this.setState({ tabs: this.state.tabs.concat(files) });
-      if (!this.state.activeTab) {
-        this.setState({ activeTab: this.state.tabs[0] });
-      }
+    ipcRenderer.on('tabClose', (event) => {
+      this.closeTab(this.state.activeTab);
     });
   }
 
@@ -33,20 +35,29 @@ export default class TabbedPane extends React.Component {
     this.setState({ activeTab: id });
   }
 
-  createEditor(uri: string) {
-    if (!uri) return <Editor doc="" fileUri={uri} extensions={[]} />;
-    return (
-      <div
-        data-id={uri}
-        className={`editor ${this.state.activeTab === uri && 'active'}`}
-      >
-        <Editor
-          doc={readFileSync(uri, 'utf8') || ''}
-          fileUri={uri}
-          extensions={[]}
-        />
-      </div>
-    );
+  closeTab(tab: string | EditorTabInfo) {
+    const { activeTab, tabs } = this.state;
+    let i: number, j: number;
+    if (typeof tab === 'string') {
+      i = tabs.findIndex((t: EditorTabInfo) => t.id === tab);
+    } else {
+      i = tabs.indexOf(tab);
+    }
+    if (i === -1) return;
+    if (i === 0) {
+      j = 0;
+    } else {
+      j = i - 1;
+    }
+    const newTabs = tabs.slice(0, i).concat(tabs.slice(i + 1));
+    const jid = newTabs.length ? newTabs[j].id : '';
+    // console.log(tabs);
+    // console.log(newTabs);
+    this.setState({
+      tabs: newTabs,
+      activeTab: activeTab === tabs[i].id ? jid : activeTab,
+    });
+    ipcRenderer.send('fileDidClose', tabs[i]);
   }
 
   render() {

@@ -4,7 +4,36 @@ import {
   shell,
   BrowserWindow,
   MenuItemConstructorOptions,
+  dialog,
 } from 'electron';
+
+import Store from 'electron-store';
+
+const schema: Record<string, unknown> = {
+  windowBounds: {
+    width: {
+      type: 'number',
+      default: 1024,
+    },
+    height: {
+      type: 'number',
+      default: 728,
+    },
+    x: {
+      type: 'number',
+      default: 0,
+    },
+    y: {
+      type: 'number',
+      default: 0,
+    },
+  },
+  workspaces: {
+    type: 'string',
+  },
+};
+
+const store = new Store(schema);
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
   selector?: string;
@@ -136,6 +165,13 @@ export default class MenuBuilder {
             this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
           },
         },
+        {
+          label: 'Toggle Developer Tools',
+          accelerator: 'Alt+Command+I',
+          click: () => {
+            this.mainWindow.webContents.toggleDevTools();
+          },
+        },
       ],
     };
     const subMenuWindow: DarwinMenuItemConstructorOptions = {
@@ -146,7 +182,7 @@ export default class MenuBuilder {
           accelerator: 'Command+M',
           selector: 'performMiniaturize:',
         },
-        { label: 'Close', accelerator: 'Command+W', selector: 'performClose:' },
+        { label: 'Close', accelerator: 'Alt+F4', selector: 'performClose:' },
         { type: 'separator' },
         { label: 'Bring All to Front', selector: 'arrangeInFront:' },
       ],
@@ -200,12 +236,60 @@ export default class MenuBuilder {
         label: '&File',
         submenu: [
           {
-            label: '&Open',
+            label: '&Open File',
             accelerator: 'Ctrl+O',
+            click: () => {
+              const files = dialog.showOpenDialogSync(this.mainWindow, {
+                filters: [
+                  {
+                    name: 'FTML files',
+                    extensions: ['wd', 'wj', 'wikidot', 'wikijump', 'ftml'],
+                  },
+                  { name: 'All Files', extensions: ['*'] },
+                ],
+                properties: ['openFile', 'multiSelections'],
+              });
+              if (files) {
+                this.mainWindow.webContents.send('fileOpen', files);
+              }
+            },
           },
           {
-            label: '&Close',
+            label: '&Open Directory',
+            accelerator: 'Ctrl+Shift+O',
+            click: () => {
+              const dir = dialog.showOpenDialogSync(this.mainWindow, {
+                properties: ['openDirectory', 'createDirectory'],
+              });
+              if (dir) {
+                app.addRecentDocument(dir[0]);
+                this.mainWindow.webContents.send('dirOpen', dir[0]);
+                store.set('workspaces', dir[0]);
+              }
+            },
+          },
+          {
+            type: 'separator',
+          },
+          {
+            label: '&Close Tab',
             accelerator: 'Ctrl+W',
+            click: () => {
+              this.mainWindow.webContents.send('tabClose');
+            },
+          },
+          {
+            label: '&Close Window',
+            accelerator: 'Alt+F4',
+            click: () => {
+              this.mainWindow.close();
+            },
+          },
+          {
+            type: 'separator',
+          },
+          {
+            label: '&Exit',
             click: () => {
               this.mainWindow.close();
             },
@@ -216,7 +300,9 @@ export default class MenuBuilder {
         label: '&View',
         submenu:
           process.env.NODE_ENV === 'development' ||
-          process.env.DEBUG_PROD === 'true'
+          process.env.DEBUG_PROD === 'true' ||
+          process.argv.includes('--debug') ||
+          process.argv.includes('-d')
             ? [
                 {
                   label: '&Reload',
@@ -250,6 +336,13 @@ export default class MenuBuilder {
                     this.mainWindow.setFullScreen(
                       !this.mainWindow.isFullScreen()
                     );
+                  },
+                },
+                {
+                  label: 'Toggle &Developer Tools',
+                  accelerator: 'Alt+Ctrl+I',
+                  click: () => {
+                    this.mainWindow.webContents.toggleDevTools();
                   },
                 },
               ],

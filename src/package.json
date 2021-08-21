@@ -11,7 +11,7 @@
   },
   "scripts": {
     "electron-rebuild": "node -r ../.erb/scripts/BabelRegister.js ../.erb/scripts/ElectronRebuild.js",
-    "postinstall": "yarn electron-rebuild"
+    "postinstall": "pnpm electron-rebuild"
   },
   "license": "MIT",
   "dependencies": {}

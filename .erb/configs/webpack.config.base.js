@@ -43,4 +43,8 @@ export default {
       NODE_ENV: 'production',
     }),
   ],
+
+  experiments: {
+    asyncWebAssembly: true,
+  }
 };

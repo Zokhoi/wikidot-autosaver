@@ -1,12 +1,14 @@
 import React from 'react';
+import { ipcRenderer } from 'electron';
 import { writeFileSync } from 'fs';
 import {
   autocompletion,
   bracketMatching,
   closeBrackets,
   drawSelection,
+  defaultHighlightStyle,
   defaultKeymap,
-  defaultTabBinding,
+  indentWithTab,
   EditorState,
   EditorView,
   Extension,
@@ -24,6 +26,11 @@ import {
   foldGutter,
   Command,
   css,
+  Transaction,
+  EditorSelection,
+  SelectionRange,
+  searchKeymap,
+  countColumn,
 } from '../CodeMirror';
 
 import CMDark from './CMDark';
@@ -33,8 +40,13 @@ class Editor extends React.Component {
 
   fileUri: string;
 
-  constructor(props: {} | Readonly<{}>) {
+  footUpdater: (info: Record<string, string>) => void;
+
+  constructor(
+    props: Record<string, unknown> | Readonly<Record<string, unknown>>
+  ) {
     super(props);
+    this.footUpdater = props.footUpdater;
     this.editorParentElRef = React.createRef<HTMLDivElement>();
     this.fileUri = props.fileUri || '';
 
@@ -52,6 +64,7 @@ class Editor extends React.Component {
           bracketMatching(),
           closeBrackets(),
           highlightSelectionMatches(),
+          // defaultHighlightStyle,
           autocompletion(),
           rectangularSelection(),
           highlightActiveLine(),
@@ -60,13 +73,14 @@ class Editor extends React.Component {
           foldGutter(),
           keymap.of([
             ...defaultKeymap,
-            defaultTabBinding,
+            indentWithTab,
+            ...searchKeymap,
             {
               key: 'Ctrl-s',
               run: (view) => {
-                if (this.fileUri) {
+                if (this.props.fileUri) {
                   writeFileSync(
-                    this.fileUri,
+                    this.props.fileUri,
                     view.state.doc.sliceString(0),
                     'utf8'
                   );
@@ -81,6 +95,27 @@ class Editor extends React.Component {
           extensions,
         ],
       }),
+      dispatch: ((tr: Transaction) => {
+        const selection: EditorSelection =
+          tr.selection ?? tr.startState.selection;
+        let cursor = '';
+        if (selection.ranges.length === 1) {
+          cursor = `Ln ${tr.newDoc.lineAt(selection.main.from).number}, Col ${
+            selection.main.to - tr.newDoc.lineAt(selection.main.from).from + 1
+          }`;
+        } else {
+          cursor = `${
+            selection.ranges.length
+          } selections (${selection.ranges.reduce(
+            (r: number, c: SelectionRange) => {
+              return r + c.to - c.from;
+            },
+            0
+          )} selected)`;
+        }
+        this.footUpdater({ cursor });
+        View.update([tr]);
+      }).bind(this),
     });
 
     this.state = {
@@ -91,6 +126,14 @@ class Editor extends React.Component {
   componentDidMount() {
     const { view } = this.state;
     this.editorParentElRef.current?.appendChild(view.dom);
+  }
+
+  componentWillUnmount() {
+    // console.log(`${this.fileUri}: umounting ${this.props.fileUri}`);
+    const { view } = this.state;
+    // console.log(view.dom);
+    this.editorParentElRef.current?.removeChild(view.dom);
+    this.destroy();
   }
 
   /**

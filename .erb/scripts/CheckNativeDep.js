@@ -1,7 +1,7 @@
-import fs from 'fs';
-import chalk from 'chalk';
-import { execSync } from 'child_process';
-import { dependencies } from '../../package.json';
+let fs = require('fs');
+let chalk = require('chalk');
+let { execSync } = require('child_process');
+let { dependencies } = require('../../package.json');
 
 if (dependencies) {
   const dependenciesKeys = Object.keys(dependencies);
@@ -32,13 +32,13 @@ ${chalk.bold(filteredRootDependencies.join(', '))} ${
         plural ? 'are native dependencies' : 'is a native dependency'
       } and should be installed inside of the "./src" folder.
  First, uninstall the packages from "./package.json":
-${chalk.whiteBright.bgGreen.bold('yarn remove your-package')}
+${chalk.whiteBright.bgGreen.bold('pnpm remove your-package')}
  ${chalk.bold(
    'Then, instead of installing the package to the root "./package.json":'
  )}
-${chalk.whiteBright.bgRed.bold('yarn add your-package')}
+${chalk.whiteBright.bgRed.bold('pnpm add -w your-package')}
  ${chalk.bold('Install the package to "./src/package.json"')}
-${chalk.whiteBright.bgGreen.bold('cd ./src && yarn add your-package')}
+${chalk.whiteBright.bgGreen.bold('cd ./src && pnpm add -w your-package')}
  Read more about native dependencies at:
 ${chalk.bold(
   'https://electron-react-boilerplate.js.org/docs/adding-dependencies/#module-structure'

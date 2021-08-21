@@ -1,0 +1,34 @@
+{
+  "name": "cm-tarnation",
+  "license": "agpl-3.0-or-later",
+  "description": "An alternative regex based parser for CodeMirror 6.",
+  "version": "0.0.0",
+  "keywords": [
+    "wikijump"
+  ],
+  "scripts": {
+    "build": ""
+  },
+  "type": "module",
+  "main": "src/index.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/scpwiki/wikijump.git",
+    "directory": "client/modules/cm-tarnation"
+  },
+  "bugs": "https://scuttle.atlassian.net/servicedesk/customer/portal/2",
+  "homepage": "https://github.com/scpwiki/wikijump#readme",
+  "eslintConfig": {
+    "extends": "../../.eslintrc.js"
+  },
+  "dependencies": {
+    "dequal": "^2.0.2",
+    "is-what": "^4.0.0",
+    "klona": "^2.0.4",
+    "lezer": "^0.13.5",
+    "lezer-tree": "^0.13.2",
+    "typescript-memoize": "^1.0.1",
+    "wj-codemirror": "workspace:*",
+    "wj-util": "workspace:*"
+  }
+}

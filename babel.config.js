@@ -42,24 +42,14 @@ module.exports = (api) => {
         { loose: false },
       ],
       require('@babel/plugin-proposal-do-expressions'),
-
-      // Stage 2
-      [require('@babel/plugin-proposal-decorators'), { legacy: true }],
-      require('@babel/plugin-proposal-function-sent'),
-      require('@babel/plugin-proposal-export-namespace-from'),
-      require('@babel/plugin-proposal-numeric-separator'),
-      require('@babel/plugin-proposal-throw-expressions'),
-
-      // Stage 3
-      require('@babel/plugin-syntax-dynamic-import'),
-      require('@babel/plugin-syntax-import-meta'),
-      [require('@babel/plugin-proposal-class-properties'), { loose: false }],
-      require('@babel/plugin-proposal-json-strings'),
       [
         require('babel-plugin-module-resolver'),
         {
           root: ['./'],
           alias: {
+            '@root': './package-wj/',
+            '@shuen/cm-tarnation': './package/cm-tarnation/',
+            '@shuen/cm-tarnation/*': './package/cm-tarnation/*',
             'cm-lang-ftml': './package-wj/client/modules/cm-lang-ftml/',
             'cm-nspell': './package-wj/client/modules/cm-nspell/',
             'cm-tarnation': './package-wj/client/modules/cm-tarnation/',
@@ -75,6 +65,23 @@ module.exports = (api) => {
           },
         },
       ],
+      [
+        require('@babel/plugin-transform-typescript'),
+        { allowDeclareFields: true },
+      ],
+
+      // Stage 2
+      [require('@babel/plugin-proposal-decorators'), { legacy: true }],
+      require('@babel/plugin-proposal-function-sent'),
+      require('@babel/plugin-proposal-export-namespace-from'),
+      require('@babel/plugin-proposal-numeric-separator'),
+      require('@babel/plugin-proposal-throw-expressions'),
+
+      // Stage 3
+      require('@babel/plugin-syntax-dynamic-import'),
+      require('@babel/plugin-syntax-import-meta'),
+      [require('@babel/plugin-proposal-class-properties'), { loose: false }],
+      require('@babel/plugin-proposal-json-strings'),
 
       ...(development ? developmentPlugins : productionPlugins),
     ],
