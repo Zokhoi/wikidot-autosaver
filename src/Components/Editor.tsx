@@ -35,19 +35,26 @@ import {
 
 import CMDark from './CMDark';
 
-class Editor extends React.Component {
+class Editor {
   editorParentElRef: React.RefObject<HTMLDivElement>;
 
   fileUri: string;
 
+  view: EditorView;
+
+  mounted = false;
+
   footUpdater: (info: Record<string, string>) => void;
 
-  constructor(
-    props: Record<string, unknown> | Readonly<Record<string, unknown>>
-  ) {
-    super(props);
+  constructor(props: {
+    footUpdater: (info: Record<string, string>) => void;
+    fileUri: string;
+    extensions?: Array<Extension>;
+    doc: string;
+    parentElRef: React.RefObject<HTMLDivElement>;
+  }) {
     this.footUpdater = props.footUpdater;
-    this.editorParentElRef = React.createRef<HTMLDivElement>();
+    this.editorParentElRef = props.parentElRef;
     this.fileUri = props.fileUri || '';
 
     const extensions = props.extensions || [];
@@ -78,9 +85,9 @@ class Editor extends React.Component {
             {
               key: 'Ctrl-s',
               run: (view) => {
-                if (this.props.fileUri) {
+                if (this.fileUri) {
                   writeFileSync(
-                    this.props.fileUri,
+                    this.fileUri,
                     view.state.doc.sliceString(0),
                     'utf8'
                   );
@@ -118,22 +125,22 @@ class Editor extends React.Component {
       }).bind(this),
     });
 
-    this.state = {
-      view: View,
-    };
+    this.view = View;
   }
 
-  componentDidMount() {
-    const { view } = this.state;
-    this.editorParentElRef.current?.appendChild(view.dom);
+  mount(parentElRef?: React.RefObject<HTMLDivElement>) {
+    if (parentElRef?.current) {
+      this.editorParentElRef = parentElRef;
+    }
+    this.editorParentElRef.current?.appendChild(this.view.dom);
+    this.mounted = true;
   }
 
-  componentWillUnmount() {
-    // console.log(`${this.fileUri}: umounting ${this.props.fileUri}`);
-    const { view } = this.state;
-    // console.log(view.dom);
-    this.editorParentElRef.current?.removeChild(view.dom);
-    this.destroy();
+  unmount() {
+    if (this.mounted) {
+      this.editorParentElRef.current?.removeChild(this.view.dom);
+      this.mounted = false;
+    }
   }
 
   /**
@@ -141,8 +148,7 @@ class Editor extends React.Component {
    * obviously not recommended.
    */
   destroy() {
-    const { view } = this.state;
-    view.destroy();
+    this.view.destroy();
   }
 
   render() {

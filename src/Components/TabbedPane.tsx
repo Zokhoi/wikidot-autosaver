@@ -1,10 +1,8 @@
 import React from 'react';
 import { ipcRenderer } from 'electron';
-import { readFileSync } from 'fs';
 import { basename } from 'path';
-import Editor from './Editor';
 
-interface TabInfo {
+interface TabBaseInfo {
   id: string;
   name: string;
 }
@@ -22,7 +20,7 @@ export default class TabbedPane extends React.Component {
       tabs: props.tabs || [],
       activeTab: active || '',
     };
-    ipcRenderer.on('tabClose', (event) => {
+    ipcRenderer.on('tabClose', (_event) => {
       this.closeTab(this.state.activeTab);
     });
   }
@@ -35,11 +33,11 @@ export default class TabbedPane extends React.Component {
     this.setState({ activeTab: id });
   }
 
-  closeTab(tab: string | EditorTabInfo) {
+  closeTab(tab: string | TabBaseInfo) {
     const { activeTab, tabs } = this.state;
     let i: number, j: number;
     if (typeof tab === 'string') {
-      i = tabs.findIndex((t: EditorTabInfo) => t.id === tab);
+      i = tabs.findIndex((t: TabBaseInfo) => t.id === tab);
     } else {
       i = tabs.indexOf(tab);
     }

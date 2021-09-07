@@ -4,7 +4,7 @@ import { readFileSync } from 'fs';
 import { basename } from 'path';
 import Editor from './Editor';
 
-interface EditorTabInfo {
+interface TabEditorInfo {
   id: string;
   name: string;
   uri: string;
@@ -14,9 +14,13 @@ interface EditorTabInfo {
 export default class TabbedEditorPane extends React.Component {
   pane: HTMLElement | null = null;
 
+  editorContainer: React.RefObject<HTMLDivElement>;
+
+  editors: Map<string, Editor> = new Map();
+
   // eslint-disable-next-line react/state-in-constructor
   state: {
-    tabs: EditorTabInfo[];
+    tabs: TabEditorInfo[];
     activeTab: string;
   };
 
@@ -26,9 +30,9 @@ export default class TabbedEditorPane extends React.Component {
     footer: (info: Record<string, string>) => void;
   }) {
     super(props);
-    let active = '';
+    let initActive = '';
     if (props.tabs?.length) {
-      active = props.activeTab ? props.activeTab : props.tabs[0];
+      initActive = props.activeTab ? props.activeTab : props.tabs[0];
     }
     this.state = {
       tabs:
@@ -38,19 +42,11 @@ export default class TabbedEditorPane extends React.Component {
           name: basename(f),
           doc: readFileSync(f, 'utf8'),
         })) || [],
-      activeTab: active || '',
+      activeTab: initActive || '',
     };
+    this.editorContainer = React.createRef<HTMLDivElement>();
     ipcRenderer.on('fileOpen', (_event, files: string[], active?: string) => {
-      this.setState({
-        tabs: this.state.tabs.concat(
-          files.map((f) => ({
-            id: Math.random().toString(36).substring(4),
-            uri: f,
-            name: basename(f),
-            doc: readFileSync(f, 'utf8'),
-          }))
-        ),
-      });
+      this.addTabs(this.createEditors(files));
       if (active) {
         this.useTab(active);
       } else if (!this.state.activeTab && this.state.tabs.length) {
@@ -64,16 +60,9 @@ export default class TabbedEditorPane extends React.Component {
       const tab = this.getTabIdForFile(file);
       if (tab) this.useTab(tab);
       else {
-        const tabid = Math.random().toString(36).substring(4);
-        this.addTabs([
-          {
-            id: tabid,
-            uri: file,
-            name: basename(file),
-            doc: readFileSync(file, 'utf8'),
-          },
-        ]);
-        this.useTab(tabid);
+        const created = this.createEditors([file]);
+        this.addTabs(created);
+        this.useTab(created[0].id);
       }
     });
   }
@@ -84,26 +73,64 @@ export default class TabbedEditorPane extends React.Component {
 
   getTabIdForFile(file: string): string | null {
     const { tabs } = this.state;
-    const i = tabs.findIndex((t: EditorTabInfo) => t.uri === file);
+    const i = tabs.findIndex((t: TabEditorInfo) => t.uri === file);
     if (i === -1) return null;
     return tabs[i].id;
   }
 
-  addTabs(tabs: Array<EditorTabInfo>) {
+  createEditors(files: Array<string>): Array<TabEditorInfo> {
+    const tabInfo: TabEditorInfo[] = [];
+    for (let i = 0; i < files.length; i += 1) {
+      let tabid = Math.random().toString(36).substring(4);
+      while (this.editors.has(tabid)) {
+        tabid = Math.random().toString(36).substring(4);
+      }
+      if (files[i]) {
+        tabInfo.push({
+          id: tabid,
+          uri: files[i],
+          name: basename(files[i]),
+          doc: readFileSync(files[i], 'utf8'),
+        });
+      } else {
+        tabInfo.push({
+          id: tabid,
+          uri: '',
+          name: 'untitled',
+          doc: '',
+        });
+      }
+    }
+    for (let i = 0; i < tabInfo.length; i += 1) {
+      this.editors.set(tabInfo[i].id, this.createEditor(tabInfo[i]));
+    }
+    return tabInfo;
+  }
+
+  addTabs(tabs: Array<TabEditorInfo>) {
     this.setState({ tabs: this.state.tabs.concat(tabs) });
   }
 
   useTab(id: string) {
+    const { activeTab, tabs } = this.state;
     this.setState({ activeTab: id });
-    const i = this.state.tabs.findIndex((t: EditorTabInfo) => t.id === id);
-    ipcRenderer.send('fileActive', i === -1 ? '' : this.state.tabs[i].uri)
+    const i = tabs.findIndex((t: TabEditorInfo) => t.id === id);
+
+    this.editorContainer.current?.setAttribute('data-id', id);
+    this.editorContainer.current?.setAttribute(
+      'data-uri',
+      i === -1 ? '' : tabs[i].uri
+    );
+    this.editors.get(activeTab)?.unmount();
+    this.editors.get(id)?.mount();
+    ipcRenderer.send('fileActive', i === -1 ? '' : tabs[i].uri);
   }
 
-  closeTab(tab: string | EditorTabInfo) {
+  closeTab(tab: string | TabEditorInfo) {
     const { activeTab, tabs } = this.state;
     let i: number, j: number;
     if (typeof tab === 'string') {
-      i = tabs.findIndex((t: EditorTabInfo) => t.id === tab);
+      i = tabs.findIndex((t: TabEditorInfo) => t.id === tab);
     } else {
       i = tabs.indexOf(tab);
     }
@@ -118,29 +145,24 @@ export default class TabbedEditorPane extends React.Component {
     // console.log(tabs);
     // console.log(newTabs);
     this.setState({ tabs: newTabs });
+    this.editors.get(activeTab)?.unmount();
+    this.editors.delete(tabs[i].id);
     this.useTab(activeTab === tabs[i].id ? jid : activeTab);
   }
 
-  createEditor(tab?: EditorTabInfo) {
-    const tabinfo: EditorTabInfo = tab || {
+  createEditor(tab?: TabEditorInfo): Editor {
+    const tabinfo: TabEditorInfo = tab || {
       id: Math.random().toString(36).substring(4),
       uri: '',
       name: 'untitled',
       doc: '',
     };
-    return (
-      <div
-        data-id={tabinfo.id}
-        data-uri={tabinfo.uri}
-        className={`editor ${this.state.activeTab === tabinfo.id && 'active'}`}
-      >
-        <Editor
-          doc={tabinfo.doc}
-          fileUri={tabinfo.uri}
-          footUpdater={this.props.footer}
-        />
-      </div>
-    );
+    return new Editor({
+      doc: tabinfo.doc,
+      fileUri: tabinfo.uri,
+      footUpdater: this.props.footer,
+      parentElRef: this.editorContainer,
+    });
   }
 
   render() {
@@ -149,7 +171,7 @@ export default class TabbedEditorPane extends React.Component {
       <div className="content-container">
         <div className="tab-bar">
           <ul>
-            {tabs.map((tab: EditorTabInfo) => (
+            {tabs.map((tab: TabEditorInfo) => (
               <li
                 role="menuitem"
                 key={tab.id}
@@ -175,9 +197,7 @@ export default class TabbedEditorPane extends React.Component {
             ))}
           </ul>
         </div>
-        <div className="editor-container">
-          {tabs.map((tab: EditorTabInfo) => this.createEditor(tab))}
-        </div>
+        <div className="editor-container" ref={this.editorContainer} />
       </div>
     );
   }
