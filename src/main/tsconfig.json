@@ -1,0 +1,40 @@
+{
+  "extends": "../../config/tsconfig-base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "/@/*": ["./*"],
+      "cm-lang-ftml": ["../.../../package-wj/client/modules/cm-lang-ftml/"],
+      "cm-lang-ftml/*": ["../../package-wj/client/modules/cm-lang-ftml/*"],
+      "cm-nspell": ["../../package-wj/client/modules/cm-nspell/"],
+      "cm-nspell/*": ["../../package-wj/client/modules/cm-nspell/*"],
+      "cm-tarnation": ["../../package-wj/client/modules/cm-tarnation/"],
+      "cm-tarnation/*": ["../../package-wj/client/modules/cm-tarnation/*"],
+      "ftml-wasm": ["../../package-wj/client/modules/ftml-wasm/"],
+      "ftml-wasm/*": ["../../package-wj/client/modules/ftml-wasm/*"],
+      "ftml-wasm-worker": ["../../package-wj/client/modules/ftml-wasm-worker/"],
+      "ftml-wasm-worker/*": ["../../package-wj/client/modules/ftml-wasm-worker/*"],
+      "threads-worker-module": ["../../package-wj/client/modules/threads-worker-module/"],
+      "threads-worker-module/*": ["../../package-wj/client/modules/threads-worker-module/*"],
+      "wj-codemirror": ["../../package-wj/client/modules/wj-codemirror/"],
+      "wj-codemirror/*": ["../../package-wj/client/modules/wj-codemirror/*"],
+      "wj-components": ["../../package-wj/client/modules/wj-components/"],
+      "wj-components/*": ["../../package-wj/client/modules/wj-components/*"],
+      "wj-css": ["../../package-wj/client/modules/wj-css/"],
+      "wj-css/*": ["../../package-wj/client/modules/wj-css/*"],
+      "wj-prism": ["../../package-wj/client/modules/wj-prism/"],
+      "wj-prism/*": ["../../package-wj/client/modules/wj-prism/*"],
+      "wj-state": ["../../package-wj/client/modules/wj-state/"],
+      "wj-state/*": ["../../package-wj/client/modules/wj-state/*"],
+      "wj-util": ["../../package-wj/client/modules/wj-util/"],
+      "wj-util/*": ["../../package-wj/client/modules/wj-util/*"]
+    },
+    "types": [
+      "../../types/importMeta",
+      "electron-devtools-installer"
+    ]
+  },
+  "files": [
+    "./index.ts"
+  ]
+}

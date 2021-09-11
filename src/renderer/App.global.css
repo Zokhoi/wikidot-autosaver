@@ -1,0 +1,477 @@
+/*
+ * @NOTE: Prepend a `~` to css file paths that are in your node_modules
+ *        See https://github.com/webpack-contrib/sass-loader#imports
+ */
+body {
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+  color: #e0e0e0;
+  background: #222;
+  font-family: sans-serif;
+  overflow-y: hidden;
+  display: block;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+}
+
+#root {
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+}
+
+button {
+  border-radius: 0;
+  border: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+button:hover {
+  transform: scale(1.05);
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+}
+
+ol {
+  margin: 0;
+  padding: 0;
+}
+
+.tab-bar {
+  background-color: #333;
+  height: 30px;
+  max-height: 30px;
+  width: 100%;
+  max-width: 100%;
+  white-space: nowrap;
+}
+
+.tab-bar ul {
+  overflow: auto;
+  max-height: 30px;
+  height: 30px;
+}
+
+.tab-bar::-webkit-scrollbar,
+.tab-bar ::-webkit-scrollbar {
+  width: 0;
+  height: 4px;
+  display: none;
+  position: absolute;
+  bottom: 0;
+  background: none;
+}
+.tab-bar:hover::-webkit-scrollbar,
+.tab-bar:hover ::-webkit-scrollbar {
+  display: block;
+}
+.tab-bar::-webkit-scrollbar-button,
+.tab-bar ::-webkit-scrollbar-button {
+  display: none;
+}
+.tab-bar::-webkit-scrollbar-track,
+.tab-bar ::-webkit-scrollbar-track {
+  background: none;
+}
+.tab-bar::-webkit-scrollbar-track-piece,
+.tab-bar ::-webkit-scrollbar-track-piece {
+  display: none;
+}
+.tab-bar::-webkit-scrollbar-thumb,
+.tab-bar ::-webkit-scrollbar-thumb {
+  display: block;
+  background-color: #666;
+}
+.tab-bar::-webkit-scrollbar-corner,
+.tab-bar ::-webkit-scrollbar-corner {
+  display: none;
+}
+
+.tab-bar li {
+  margin: 0;
+  padding-inline: 1em;
+  max-width: fit-content;
+  height: 30px;
+  max-height: 30px;
+  display: inline-block;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: pointer;
+}
+
+.tab-bar li.active {
+  background-color: #222;
+}
+
+.tab-bar li a.tab-close {
+  display: inline-block;
+  color: transparent;
+  background-color: transparent;
+  padding: 1.5px;
+}
+
+.tab-bar li:hover a.tab-close {
+  color: #e0e0e0;
+}
+
+.tab-bar li a.tab-close:hover {
+  color: #e0e0e0;
+  background-color: #434343;
+  border-radius: 3px;
+}
+
+li {
+  list-style: none;
+}
+
+a {
+  text-decoration: none;
+  color: rgb(252, 252, 252);
+  height: fit-content;
+  width: fit-content;
+  margin: 0;
+}
+
+a:hover {
+  opacity: 1;
+  text-decoration: none;
+}
+
+.stub-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.home h1,
+.home .description {
+  text-align: center;
+}
+
+.layout-container {
+  display: flex;
+  flex-wrap: nowrap;
+  height: 100%;
+  width: 100%;
+  /* border:1px solid red; */
+}
+
+.layout-container.vertical {
+  flex-direction: column;
+}
+
+.layout-container.horizontal {
+  flex-direction: row;
+}
+
+.layout-container .pane {
+  min-width: 0;
+  flex-shrink: 1;
+}
+
+.side-container {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: center;
+  /* height: 100%; */
+  width: 50px;
+  flex-basis: 50px;
+  background-color: #434343;
+  /* border: 1px solid blue; */
+}
+
+.side-item {
+  width: 50px;
+  height: 50px;
+  /* border-color: #737475; */
+  color: #999999;
+  cursor: pointer;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* border: 1px solid green; */
+}
+
+.side-item:hover {
+  color: #f5f5f5;
+}
+
+.side-item:last-child {
+  margin-top: auto;
+}
+
+.side-item.active {
+  width: 46px;
+  border-left: #f5f5f5 2px solid;
+  border-right: transparent 2px solid;
+  color: #f5f5f5;
+}
+
+.content-container {
+  width: calc(100% - 50px);
+  flex-basis: calc(100% - 50px);
+}
+
+.header {
+  /* display: flex;
+  flex-direction: row; */
+  top: 0;
+  height: 30px;
+  width: 100%;
+  color: #bbbbbb;
+  background-color: #434343;
+}
+
+.header .title {
+  display: inline-block;
+  line-height: 30px;
+  width: calc(100vw - 138px);
+  text-align: center;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+}
+
+.header .controls {
+  position: relative;
+  display: inline-flex;
+  /* right: 0; */
+  width: 138px;
+  height: 100%;
+}
+
+.header .controls .window-icon {
+  display: inline-block;
+  flex: 1;
+  text-align: center;
+  line-height: 30px;
+}
+
+.header .controls .window-icon:hover {
+  background-color: #555555;
+}
+
+.header .controls .window-icon.window-close:hover {
+  background-color: #da2121;
+}
+
+.header svg {
+  vertical-align: middle;
+}
+
+.footer {
+  bottom: 0;
+  height: 30px;
+  color: #bbbbbb;
+  background-color: #434343;
+}
+
+.rule.vertical {
+  width: 2px;
+  background-color: #434343;
+}
+
+.content-container {
+  height: 100%;
+  width: 100%;
+}
+
+.editor-container {
+  height: calc(100% - 30px);
+  width: 100%;
+}
+
+.editor {
+  height: 100%;
+  width: 100%;
+  display: none;
+}
+
+.editor.active {
+  display: block;
+}
+
+.file-list::-webkit-scrollbar {
+  width: 13px;
+}
+.cm-scroller::-webkit-scrollbar {
+  width: 13px;
+  border-left: 1px solid #333;
+  border-top: 1px solid #333;
+}
+.file-list::-webkit-scrollbar-button,
+.cm-scroller::-webkit-scrollbar-button,
+.cm-scroller::-webkit-scrollbar-corner {
+  display: none;
+}
+.file-list::-webkit-scrollbar-track-piece,
+.cm-scroller::-webkit-scrollbar-track-piece {
+  background-color: transparent;
+}
+.file-list::-webkit-scrollbar-thumb,
+.cm-scroller::-webkit-scrollbar-thumb {
+  background-color: #fff0;
+}
+.file-list:hover::-webkit-scrollbar-thumb,
+.cm-scroller:hover::-webkit-scrollbar-thumb {
+  background-color: #fff3;
+}
+.file-list::-webkit-scrollbar-thumb:hover,
+.cm-scroller::-webkit-scrollbar-thumb:hover {
+  background-color: #fff6;
+}
+
+@keyframes fadeBg {
+  from {
+    background-color: #6660;
+  }
+  to {
+    background-color: #6666;
+  }
+}
+
+.mainpane {
+  display: inline-block;
+  width: calc(100% - 50px);
+  height: 100%;
+}
+
+.sidepane {
+  display: none;
+  width: 300px;
+  background-color: #2a2a2a;
+}
+
+.sidepane.active {
+  display: inline-block;
+}
+
+.side-tab.active {
+  display: inline-block;
+}
+
+.side-tab {
+  display: none;
+}
+
+.sidepane.active ~ .mainpane {
+  width: calc(100% - 350px);
+}
+
+.sidepane .dir-container {
+  font-size: 13.5px;
+  overflow: auto;
+  width: 100%;
+  height: 100%;
+}
+
+.sidepane .file-list,
+.sidepane .file-list .file-item {
+  word-break: keep-all;
+  overflow-wrap: normal;
+  overflow: hidden;
+}
+
+.sidepane .file-list {
+  height: 100%;
+}
+
+.dir-container > .file-list {
+  overflow: auto;
+  padding-left: 20px;
+  padding-block: 10px;
+  width: calc(100% - 20px);
+  height: calc(100% - 20px);
+}
+
+.dir-container .collapsible-container.fold > .file-list {
+  display: none;
+}
+.dir-container
+  .collapsible-container
+  > .collapsible-anchor
+  > .collapsible-logo {
+  display: inline-block;
+  width: 17px;
+}
+.dir-container
+  .collapsible-container
+  > .collapsible-anchor
+  > .collapsible-logo
+  > svg {
+  display: none;
+}
+.dir-container
+  .collapsible-container.show
+  > .collapsible-anchor
+  > .collapsible-logo
+  > svg.show,
+.dir-container
+  .collapsible-container.fold
+  > .collapsible-anchor
+  > .collapsible-logo
+  > svg.fold {
+  display: inline;
+}
+.dir-container .collapsible-container.show > .file-list {
+  display: block;
+}
+
+.sidepane .file-list .file-item {
+  cursor: pointer;
+  /* margin: 1px;
+  width: calc(100% - 2px); */
+  width: 100%;
+}
+
+.dir-container .collapsible-anchor {
+  cursor: pointer;
+}
+
+.sidepane .file-list .file-item.active {
+  background-color: #434343;
+}
+
+.sidepane .file-list .file-item:not(.active):hover,
+.sidepane .file-list .collapsible-anchor:hover {
+  background-color: #43434355;
+  /* outline: 1px solid #434343; */
+}
+.sidepane .file-list .file-item:focus,
+.sidepane .file-list .collapsible-anchor:hover {
+  /* background-color: #007fd455; */
+  outline: #007fd4 1px solid;
+}
+.sidepane .file-list:focus-within .file-item.active {
+  background-color: #007fd455;
+}
+
+.side-tab,
+.DirectoryPane {
+  width: 100%;
+  height: 100%;
+}
+
+.DirectoryPane {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+:focus {
+  outline: #007fd4 1px solid;
+}
+
+.cm-scroller:focus,
+.cm-scroller:focus-within {
+  outline: none;
+}
