@@ -62,6 +62,13 @@ module.exports = {
         ),
       },
       {
+        find: 'wj-codemirror',
+        replacement: resolve(
+          __dirname,
+          '../package-wj/client/modules/wj-codemirror',
+        ),
+      },
+      {
         find: 'wj-util',
         replacement: resolve(
           __dirname,

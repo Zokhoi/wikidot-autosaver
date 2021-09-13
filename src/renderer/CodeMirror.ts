@@ -338,6 +338,6 @@ export { css, cssCompletion, cssLanguage } from '@codemirror/lang-css';
 export { html, htmlCompletion, htmlLanguage } from '@codemirror/lang-html';
 
 
-export { TarnationLanguage } from 'cm-tarnation';
+// export { TarnationLanguage } from 'cm-tarnation';
 
 // export { FTMLLanguage } from 'cm-lang-ftml';

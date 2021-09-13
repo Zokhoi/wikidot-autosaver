@@ -7,7 +7,7 @@ module.exports = {
   appId: 'com.zokhoi.shuen',
   directories: {
     output: 'dist/app',
-    buildResources: 'build',
+    buildResources: 'assets',
     app: 'dist/source',
   },
   mac: {
@@ -57,7 +57,7 @@ module.exports = {
     ],
     category: 'Development',
     synopsis: 'Edit offline and sync wikidot pages',
-    icon: '16x16.png',
+    icon: '512x512.png',
     executableName: 'shuen',
     mimeTypes: [
       'inode/directory',

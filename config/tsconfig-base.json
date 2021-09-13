@@ -9,7 +9,8 @@
     "isolatedModules": true,
     "types": [
       "../../types/importMeta",
-      "node"
+      "node",
+      "vite/client"
     ],
     "allowSyntheticDefaultImports": true
   },
