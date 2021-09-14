@@ -1,7 +1,6 @@
-const { join, resolve } = require('path');
+const { resolve } = require('path');
 const { node } = require('./electron-dep-versions');
 import commonjsExternals from 'vite-plugin-commonjs-externals';
-import copy from 'rollup-plugin-copy';
 const bundledWorker = require(resolve(__dirname, '../config/vite-plugin-bundled-worker'));
 
 /**
@@ -9,6 +8,8 @@ const bundledWorker = require(resolve(__dirname, '../config/vite-plugin-bundled-
  * @see https://vitejs.dev/config/
  */
 module.exports = {
+  mode: process.env.MODE,
+  base: './',
   resolve: {
     alias: [
       {
@@ -90,14 +91,6 @@ module.exports = {
         chunkFileNames: '[name].[format].js',
         assetFileNames: '[name].[ext]',
       },
-      plugins: [
-        copy({
-          targets: [
-            { src: 'source/main/ftml.worker.7c11a202.js', dest: 'dist/source/main' },
-          ],
-          hook: 'writeBundle',
-        }),
-      ],
     },
     emptyOutDir: true,
   },

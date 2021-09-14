@@ -8,6 +8,8 @@ const bundledWorker = require(resolve(__dirname, '../config/vite-plugin-bundled-
  * @see https://vitejs.dev/config/
  */
 module.exports = {
+  mode: process.env.MODE,
+  base: './',
   root: join(process.cwd(), './src/renderer'),
   server: {
     port: 1212,

@@ -9,9 +9,12 @@ export default class PreviewPane extends React.Component {
 
     ipcRenderer.on(
       'sourceUpdate',
-      ((_event, html: string) => {
+      ((_event, html: string, styles: string[]) => {
         if (this.viewElRef.current) {
           this.viewElRef.current.innerHTML = html;
+          for (let i = 0; i < styles.length; i++) {
+            this.viewElRef.current.innerHTML += `\n\n<style>\n${styles[i].replace(/\</g, '&lt;')}\n</style>`;
+          }
         }
       }).bind(this),
     );

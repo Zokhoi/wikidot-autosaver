@@ -5,18 +5,19 @@
  * electron renderer process from here and communicate with the other processes
  * through IPC.
  *
- * When running `yarn build` or `yarn build:main`, this file is compiled to
- * `./src/main.prod.js` using webpack. This gives us some performance wins.
+ * When running `pnpm build` or `pnpm build:main`, this file is compiled to
+ * `./dist/source/main/index.cjs.js` using vite. This gives us some performance wins.
  */
   import 'core-js/stable';
   import 'regenerator-runtime/runtime';
   import * as path from 'path';
+  import { URL } from 'url';
   import { app, BrowserWindow, shell, ipcMain } from 'electron';
   import { autoUpdater } from 'electron-updater';
   import log from 'electron-log';
   import Store from 'electron-store';
   import { Worker } from 'worker_threads';
-  import ftmlRaw from './ftml.worker?raw';
+  import ftmlRaw from './ftml.worker?raw&inline';
   import electronLocalShortcut from 'electron-localshortcut';
   import * as fs from 'fs';
   import MenuBuilder from './menu';
@@ -31,10 +32,10 @@
 
   let mainWindow: BrowserWindow | null = null;
 
-  if (process.env.NODE_ENV === 'production') {
-    const sourceMapSupport = require('source-map-support');
-    sourceMapSupport.install();
-  }
+  // if (process.env.NODE_ENV === 'production') {
+  //   const sourceMapSupport = require('source-map-support');
+  //   sourceMapSupport.install();
+  // }
 
   if (
     process.env.NODE_ENV === 'development' ||
@@ -123,7 +124,17 @@
       frame: process.platform !== 'win32',
     });
 
-    mainWindow.loadURL(`http://localhost:1212/index.html`);
+    /**
+     * URL for main window.
+     * Vite dev server for development.
+     * `file://../renderer/index.html` for production and test
+     */
+    const pageUrl = import.meta.env.MODE === 'development' && import.meta.env.VITE_DEV_SERVER_URL !== undefined
+    ? import.meta.env.VITE_DEV_SERVER_URL
+    : new URL('./renderer/index.html', 'file://' + __dirname).toString();
+
+
+    mainWindow.loadURL(pageUrl);
 
     // electronLocalShortcut.register(mainWindow, 'CmdOrCtrl+W', () => {
     //   mainWindow?.webContents.send('closeCurrentTab');
@@ -191,6 +202,9 @@
       const w = new Worker(ftmlRaw, {
         workerData: { ftmlSource: source },
         eval: true,
+        env: {
+          MODE: import.meta.env.MODE,
+        },
       });
       w.once(
         'message',

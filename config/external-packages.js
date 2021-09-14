@@ -7,11 +7,13 @@
  they will not be optimized, will not be included in your bundle, and will be delivered as a separate node module.
 */
 module.exports.external = [
-  // '@wikijump/ftml-wasm',
+  '@wikijump/ftml-wasm',
   // '@wikijump/ftml-wasm-worker',
   // '@wikijump/util',
+  'asar-fs',
   'electron',
   'electron-updater',
+  // 'source-map-support',
   'threads',
   'threads/dist/types/worker',
   'winreg',

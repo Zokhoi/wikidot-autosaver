@@ -6,6 +6,8 @@ const {chrome} = require('./electron-dep-versions');
  * @see https://vitejs.dev/config/
  */
 module.exports = {
+  mode: process.env.MODE,
+  base: './',
   alias: {
     '/@/': join(process.cwd(), './src/preload') + '/',
   },

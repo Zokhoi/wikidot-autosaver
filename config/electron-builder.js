@@ -10,6 +10,9 @@ module.exports = {
     buildResources: 'assets',
     app: 'dist/source',
   },
+  asarUnpack: [
+    './node_modules/@wikijump/ftml-wasm',
+  ],
   mac: {
     target: [
       'dmg',

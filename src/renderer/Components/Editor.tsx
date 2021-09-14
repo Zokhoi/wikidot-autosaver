@@ -16,6 +16,7 @@ import {
   highlightSelectionMatches,
   highlightSpecialChars,
   history,
+  historyKeymap,
   indentOnInput,
   KeyBinding,
   keymap,
@@ -31,7 +32,7 @@ import {
   SelectionRange,
   searchKeymap,
   countColumn,
-  TarnationLanguage,
+  // TarnationLanguage,
 } from '../CodeMirror';
 
 import { confinement } from '../theme';
@@ -85,6 +86,7 @@ class Editor {
             ...defaultKeymap,
             indentWithTab,
             ...searchKeymap,
+            ...historyKeymap,
             {
               key: 'Ctrl-s',
               run: (view) => {
@@ -93,7 +95,7 @@ class Editor {
                     this.fileUri,
                     view.state.doc.sliceString(0),
                     'utf8',
-                    () => {}
+                    _ => {},
                   );
                   return true;
                 }
@@ -126,7 +128,9 @@ class Editor {
         }
         if (this.mounted) {
           this.footUpdater({ cursor });
-          ipcRenderer.invoke('sourceUpdate', tr.newDoc.toJSON().join('\n'));
+          if (tr.docChanged) {
+            ipcRenderer.invoke('sourceUpdate', tr.newDoc.toJSON().join('\n'));
+          }
         }
         View.update([tr]);
       }).bind(this),
@@ -140,6 +144,7 @@ class Editor {
       this.editorParentElRef = parentElRef;
     }
     this.editorParentElRef.current?.appendChild(this.view.dom);
+    ipcRenderer.invoke('sourceUpdate', this.view.state.doc.toJSON().join('\n'));
     this.mounted = true;
   }
 
