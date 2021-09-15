@@ -204,6 +204,7 @@
         eval: true,
         env: {
           MODE: import.meta.env.MODE,
+          DIRNAME: __dirname,
         },
       });
       w.once(
