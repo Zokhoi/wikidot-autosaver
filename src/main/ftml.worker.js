@@ -10,18 +10,18 @@ let MODE = process.env.MODE || (process.env).MODE;
 if (MODE != 'development') {
   ftmlPath = './resources/app.asar.unpacked/node_modules/' + ftmlPath;
   wasmPath = './resources/app.asar.unpacked/' + wasmPath;
-}
 
-if ((process.env).DIRNAME.endsWith('/app.asar/main')) {
-  ftmlPath = join((process.env).DIRNAME,  '../../../', ftmlPath);
-  wasmPath = join((process.env).DIRNAME,  '../../../', wasmPath);
+  if ((process.env).DIRNAME.endsWith('/app.asar/main')) {
+    ftmlPath = join((process.env).DIRNAME,  '../../../', ftmlPath);
+    wasmPath = join((process.env).DIRNAME,  '../../../', wasmPath);
+  }
 }
 
 const ftml = require(ftmlPath);
 
 ftml.init(fs.readFileSync(wasmPath));
 
-async function renderHTML() {
+!(async () => {
   if (!ftml.ready) await ftml.loading;
 
   const { ftmlSource } = workerData;
@@ -30,6 +30,4 @@ async function renderHTML() {
 
   // sending message back to main thread
   parentPort.postMessage({ html, styles });
-}
-
-renderHTML();
+})();
