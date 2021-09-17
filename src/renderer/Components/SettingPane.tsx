@@ -14,9 +14,11 @@ export default class SettingPane extends React.Component {
   }
 
   componentDidMount() {
-    Handle.fileHandler.isRegistered((i) => (this.fowHandle.checked = i));
-    Handle.fileContextMenu.isRegistered((i) => (this.fHandle.checked = i));
-    Handle.folderContextMenu.isRegistered((i) => (this.dHandle.checked = i));
+    if (process.platform=='win32') {
+      Handle.fileHandler.isRegistered((i) => (this.fowHandle.checked = i));
+      Handle.fileContextMenu.isRegistered((i) => (this.fHandle.checked = i));
+      Handle.folderContextMenu.isRegistered((i) => (this.dHandle.checked = i));
+    }
   }
 
   setRegistration(option, shouldBeRegistered) {

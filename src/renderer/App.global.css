@@ -1,3 +1,6 @@
+@import url('./wikidot.css');
+@import url('./Collapsible.css');
+
 /*
  * @NOTE: Prepend a `~` to css file paths that are in your node_modules
  *        See https://github.com/webpack-contrib/sass-loader#imports
@@ -305,6 +308,10 @@ a:hover {
   height: 100%;
   width: 100%;
   overflow: auto;
+}
+
+.preview-content {
+  margin: 1em;
 }
 
 .file-list::-webkit-scrollbar {

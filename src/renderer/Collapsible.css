@@ -1,12 +1,16 @@
-/* .wj-collapsible-block {
-  display:block;
-  line-height:normal;
-  list-style:none;
-  margin:0;
-  padding:0;
+.wj-collapsible-block {
+  display: block;
+  line-height: normal;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-.wj-collapsible-block >  */
+.wj-collapsible-block-link.wj-collapsible-block-folded,
+.wj-collapsible-block.folded > .wj-collapsible-block-folded,
+.wj-collapsible-block.unfolded > .wj-collapsible-block-unfolded {
+  display: none;
+}
 
 
 /* colmod support */
