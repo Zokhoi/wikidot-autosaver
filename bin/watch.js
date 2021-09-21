@@ -96,6 +96,16 @@ function startElectron() {
 
 
   // Run electron app
-  startElectron();
+  const elec = startElectron();
+  elec.stdout.on('data', (data) => {
+    console.log(data.toString().split('\n').map(l=>`[E] ${l}`).join('\n'));
+  });
+  elec.stderr.on('data', (data) => {
+    console.log(data.toString().split('\n').map(l=>`[E] ${l}`).join('\n'));
+  });
+  elec.on('close', (c) => {
+    console.log(`[E] Electron exited with code ${c}`);
+    process.exit(0);
+  });
 })();
 

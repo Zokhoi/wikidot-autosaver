@@ -2,11 +2,6 @@ import React from 'react';
 import { ipcRenderer } from 'electron';
 import * as path from 'path';
 
-interface TabBaseInfo {
-  id: string;
-  name: string;
-}
-
 export default class TabbedPane extends React.Component {
   pane: HTMLElement | null = null;
 

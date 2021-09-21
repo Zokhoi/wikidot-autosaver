@@ -3,13 +3,7 @@ import { ipcRenderer } from 'electron';
 import * as fs from 'fs';
 import * as path from 'path';
 import Editor from './Editor';
-
-interface TabEditorInfo {
-  id: string;
-  name: string;
-  uri: string;
-  doc: string;
-}
+import type { TabEditorInfo } from './TabTypes';
 
 export default class TabbedEditorPane extends React.Component {
   pane: HTMLElement | null = null;
@@ -36,9 +30,10 @@ export default class TabbedEditorPane extends React.Component {
     this.state = {
       tabs:
         props.tabs?.map((f) => ({
+          type: 'editor',
           id: Math.random().toString(36).substring(4),
           uri: f,
-          name: path.basename(f),
+          title: path.basename(f),
           doc: fs.readFileSync(f, 'utf8'),
         })) || [],
       activeTab: initActive || '',
@@ -86,16 +81,18 @@ export default class TabbedEditorPane extends React.Component {
       }
       if (files[i]) {
         tabInfo.push({
+          type: 'editor',
           id: tabid,
           uri: files[i],
-          name: path.basename(files[i]),
+          title: path.basename(files[i]),
           doc: fs.readFileSync(files[i], 'utf8'),
         });
       } else {
         tabInfo.push({
+          type: 'editor',
           id: tabid,
           uri: '',
-          name: 'untitled',
+          title: 'untitled',
           doc: '',
         });
       }
@@ -151,9 +148,10 @@ export default class TabbedEditorPane extends React.Component {
 
   createEditor(tab?: TabEditorInfo): Editor {
     const tabinfo: TabEditorInfo = tab || {
+      type: 'editor',
       id: Math.random().toString(36).substring(4),
       uri: '',
-      name: 'untitled',
+      title: 'untitled',
       doc: '',
     };
     return new Editor({
@@ -181,12 +179,12 @@ export default class TabbedEditorPane extends React.Component {
                 data-uri={tab.uri}
                 onClick={() => this.useTab(tab.id)}
               >
-                {tab.name}{' '}
+                {tab.title}{' '}
                 <a
                   type="button"
                   className="tab-close"
                   onClick={(e) => {
-                    this.closeTab(tab)
+                    this.closeTab(tab);
                     e.stopPropagation();
                   }}
                 >
