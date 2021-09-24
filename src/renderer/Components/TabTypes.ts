@@ -7,6 +7,7 @@ export interface TabBaseInfo {
 export interface TabEditorInfo extends TabBaseInfo {
   uri: string;
   doc: string;
+  lang: string;
 }
 
 export interface TabPreviewInfo extends TabBaseInfo {

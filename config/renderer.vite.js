@@ -83,6 +83,7 @@ module.exports = {
   build: {
     target: `chrome${chrome}`,
     polyfillDynamicImport: false,
+    minify: process.env.MODE === 'development' ? false : 'terser',
     base: '',
     outDir: join(process.cwd(), 'dist/source/renderer'),
     assetsDir: '.',

@@ -32,6 +32,7 @@ import {
   SelectionRange,
   searchKeymap,
   countColumn,
+  javascript,
   // TarnationLanguage,
 } from '../CodeMirror';
 
@@ -45,6 +46,8 @@ class Editor {
 
   view: EditorView;
 
+  lang: string;
+
   mounted = false;
 
   footUpdater: (info: Record<string, string>) => void;
@@ -55,10 +58,12 @@ class Editor {
     extensions?: Array<Extension>;
     doc: string;
     parentElRef: React.RefObject<HTMLDivElement>;
+    lang: string;
   }) {
     this.footUpdater = props.footUpdater;
     this.editorParentElRef = props.parentElRef;
     this.fileUri = props.fileUri || '';
+    this.lang = props.lang || 'txt';
 
     const extensions = props.extensions || [];
 
@@ -74,7 +79,6 @@ class Editor {
           bracketMatching(),
           closeBrackets(),
           highlightSelectionMatches(),
-          // defaultHighlightStyle,
           confinement,
           autocompletion(),
           rectangularSelection(),
@@ -105,6 +109,8 @@ class Editor {
           ]),
           CMDark,
           css(),
+          javascript(),
+          // defaultHighlightStyle,
           extensions,
         ],
       }),
@@ -128,7 +134,7 @@ class Editor {
         }
         if (this.mounted) {
           this.footUpdater({ cursor });
-          if (tr.docChanged) {
+          if (tr.docChanged && this.lang == 'ftml') {
             ipcRenderer.invoke('sourceUpdate', tr.newDoc.toJSON().join('\n'));
           }
         }
@@ -144,7 +150,9 @@ class Editor {
       this.editorParentElRef = parentElRef;
     }
     this.editorParentElRef.current?.appendChild(this.view.dom);
-    ipcRenderer.invoke('sourceUpdate', this.view.state.doc.toJSON().join('\n'));
+    if (this.lang == 'ftml') {
+      ipcRenderer.invoke('sourceUpdate', this.view.state.doc.toJSON().join('\n'));
+    }
     this.mounted = true;
   }
 

@@ -337,6 +337,8 @@ export { css, cssCompletion, cssLanguage } from '@codemirror/lang-css';
 
 export { html, htmlCompletion, htmlLanguage } from '@codemirror/lang-html';
 
+export { javascript, javascriptLanguage, typescriptLanguage, jsxLanguage, tsxLanguage } from '@codemirror/lang-javascript';
+
 
 // export { TarnationLanguage } from 'cm-tarnation';
 

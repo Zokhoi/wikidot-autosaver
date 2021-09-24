@@ -35,6 +35,7 @@ export default class TabbedEditorPane extends React.Component {
           uri: f,
           title: path.basename(f),
           doc: fs.readFileSync(f, 'utf8'),
+          lang: path.extname(f)?.slice(1) || 'txt',
         })) || [],
       activeTab: initActive || '',
     };
@@ -86,6 +87,7 @@ export default class TabbedEditorPane extends React.Component {
           uri: files[i],
           title: path.basename(files[i]),
           doc: fs.readFileSync(files[i], 'utf8'),
+          lang: path.extname(files[i])?.slice(1) || 'txt',
         });
       } else {
         tabInfo.push({
@@ -94,6 +96,7 @@ export default class TabbedEditorPane extends React.Component {
           uri: '',
           title: 'untitled',
           doc: '',
+          lang: 'txt',
         });
       }
     }
@@ -138,8 +141,7 @@ export default class TabbedEditorPane extends React.Component {
     }
     const newTabs = tabs.slice(0, i).concat(tabs.slice(i + 1));
     const jid = newTabs.length ? newTabs[j].id : '';
-    // console.log(tabs);
-    // console.log(newTabs);
+    if (!jid) ipcRenderer.invoke('sourceUpdate', null);
     this.setState({ tabs: newTabs });
     this.editors.get(activeTab)?.unmount();
     this.editors.delete(tabs[i].id);
@@ -153,12 +155,14 @@ export default class TabbedEditorPane extends React.Component {
       uri: '',
       title: 'untitled',
       doc: '',
+      lang: 'txt',
     };
     return new Editor({
       doc: tabinfo.doc,
       fileUri: tabinfo.uri,
       footUpdater: this.props.footer,
       parentElRef: this.editorContainer,
+      lang: tabinfo.lang,
     });
   }
 

@@ -16,8 +16,6 @@
   import { autoUpdater } from 'electron-updater';
   import log from 'electron-log';
   import Store from 'electron-store';
-  import { Worker } from 'worker_threads';
-  import ftmlRaw from './ftml.worker?raw&inline';
   import electronLocalShortcut from 'electron-localshortcut';
   import * as fs from 'fs';
   import MenuBuilder from './menu';
@@ -117,6 +115,7 @@
       icon: getAssetPath('icon.png'),
       webPreferences: {
         nodeIntegration: true,
+        nodeIntegrationInWorker: true,
       //  enableRemoteModule: true,
         contextIsolation: false,
       //  preload: path.resolve(__dirname, '../preload/index.ts'),
@@ -198,22 +197,8 @@
     ipcMain.handle('fileActive', (_event, ...props) => {
       mainWindow?.webContents.send('fileActive', ...props);
     });
-    ipcMain.handle('sourceUpdate', (_event, source: string) => {
-      const w = new Worker(ftmlRaw, {
-        workerData: { ftmlSource: source },
-        eval: true,
-        env: {
-          MODE: import.meta.env.MODE,
-          DIRNAME: __dirname,
-        },
-      });
-      w.once(
-        'message',
-        ({ html, styles }: { html: string, styles: string[] }) => {
-          mainWindow?.webContents.send('sourceUpdate', html, styles);
-        },
-      );
-      w.once('error', console.log);
+    ipcMain.handle('sourceUpdate', (_event, source: string | null) => {
+      mainWindow?.webContents.send('sourceUpdate', source);
     });
 
     mainWindow.on('resize', () => {
