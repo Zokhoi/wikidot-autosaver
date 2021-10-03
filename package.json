@@ -1,6 +1,6 @@
 {
   "name": "wikidot-autosaver",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A simple script that auto-saves to wikidot.",
   "main": "index.js",
   "scripts": {
