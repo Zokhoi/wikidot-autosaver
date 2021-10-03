@@ -5,11 +5,11 @@
  ------
  ### Dependencies and starting the script
  This script requires Node v8 or above to work as it uses async/await. Install other dependencies with
- ```
+ ```sh
  npm i
  ```
  Start the script with
- ```
+ ```sh
  node index.js
  ```
  in command line.
@@ -32,7 +32,7 @@
 The script auto-generates folders named with sites specified in the config in the folder specified source folder path. <br />
 e.g. if you want to save to `scp-sandbox-3` page `a`, and to `wanderers-sandbox` pages `b:c` and `e`, <br />
 `config.yml`:
-```YAML
+```yaml
 site:
   - "scp-sandbox-3"
   - "wanderers-sandbox"
@@ -44,7 +44,7 @@ pages:
     - "e"
 ```
 or equivalently `config.json`:
-```JSON
+```json
 {
   "site": ["scp-sandbox-3", "wanderers-sandbox"],
   "source": "D:/Wikidot/",
@@ -78,9 +78,17 @@ title: (your title here)
 tags: (tags here)
 parent: (full parent page name here)
 comments: (revision comment here)
-(another line of comment here)
 ~~~~~~
 (your page source here)
 ```
+or with YAML front matter:
+``` yaml
+---
+title: (your title here)
+tags: (tags here)
+parent: (full parent page name here)
+comments: (revision comment here)
+---
+(your page source here)
+```
 Any of title, tags, parent and comment are optional but are suggested to be kept even if they are empty, for your own ease.
-Title, tags and parent only accept one line, any other lines will be treated as revision comments.

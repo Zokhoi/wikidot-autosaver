@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
+const fm = require('front-matter');
 const WD = require('./wd.js');
 const isFileExists = (name) => {
   try {
@@ -75,39 +76,66 @@ const wd = new WD(config.site);
         tags: "",
         parentPage: "",
       }
-      let sauce = raw.split(/~{4,}/);
-      let tilde = raw.match(/~{4,}/gi) || [];
-      tilde.shift();
-      let tmp = [];
-      if (sauce.length===1) {
-        info.source = raw;
-      } else {
-        let metadata = sauce.shift().split("\n").filter(v=>!!v);
-        let placeholder = JSON.parse(JSON.stringify(metadata));
-        for (let i = 0; i < sauce.length; i++) {
-          if (sauce[i]) tmp.push(sauce[i]);
-          if (tilde[i]) tmp.push(tilde[i]);
-        }
-        sauce = tmp.join("").split("\n");
-        sauce.shift();
-        info.source = sauce.join("\n");
-        for (let ln of metadata) {
-          if (ln.toLowerCase().startsWith("title")) {
-            placeholder.splice(placeholder.indexOf(ln), 1)
-            info.title = ln.substring("title:".length).split(" ").filter(v=>!!v).join(" ")
-          } else if (ln.toLowerCase().startsWith("tags")) {
-            placeholder.splice(placeholder.indexOf(ln), 1)
-            info.tags = ln.substring("tags:".length).split(" ").filter(v=>!!v).join(" ")
-          } else if (ln.toLowerCase().startsWith("comments")) {
-            placeholder.splice(placeholder.indexOf(ln), 1)
-            placeholder.unshift(ln.substring("comments:".length).split(" ").filter(v=>!!v).join(" "))
-            info.comments = placeholder.join("\n");
-          } else if (ln.toLowerCase().startsWith("parent")) {
-            placeholder.splice(placeholder.indexOf(ln), 1)
-            info.parentPage = ln.substring("parent:".length).split(" ").filter(v=>!!v).join(" ").trim().replace(/~/g,':')
+      if (fm.test(raw)) {
+        let content = fm(raw);
+        if (content.attributes.title && typeof content.attributes.title == 'string') info.title = content.attributes.title;
+        if (content.attributes.tags) {
+          switch (typeof content.attributes.tags) {
+            case 'string':
+              info.tags = content.attributes.tags;
+              break;
+            case 'array':
+              info.tags = " ".join(content.attributes.tags);
+              break;
+            default:
+              info.tags = JSON.stringify(content.attributes.tags);
+              break;
           }
         }
-      }
+        if (content.attributes.parentPage && typeof content.attributes.parentPage == 'string') info.parentPage = content.attributes.parentPage;
+        if (content.attributes.parent && typeof content.attributes.parent == 'string') info.parent = content.attributes.parent;
+        if (content.attributes.comments && typeof content.attributes.comments == 'string') info.comments = content.attributes.comments;
+        info.source = content.body;
+      } else {
+        let sauce = raw.split(/~{4,}/);
+        let tilde = raw.match(/~{4,}/gi) || [];
+        tilde.shift();
+        let tmp = [];
+        if (sauce.length===1) {
+          info.source = raw;
+        } else {
+          let metadata = sauce.shift().split("\n").filter(v=>!!v);
+          let placeholder = JSON.parse(JSON.stringify(metadata));
+          for (let i = 0; i < sauce.length; i++) {
+            if (sauce[i]) tmp.push(sauce[i]);
+            if (tilde[i]) tmp.push(tilde[i]);
+          }
+          sauce = tmp.join("").split("\n");
+          sauce.shift();
+          info.source = sauce.join("\n");
+          for (let ln of metadata) {
+            if (ln.toLowerCase().startsWith("title")) {
+              placeholder.splice(placeholder.indexOf(ln), 1)
+              info.title = ln.substring("title:".length).split(" ").filter(v=>!!v).join(" ")
+            } else if (ln.toLowerCase().startsWith("tags")) {
+              placeholder.splice(placeholder.indexOf(ln), 1)
+              info.tags = ln.substring("tags:".length).split(" ").filter(v=>!!v).join(" ")
+            } else if (ln.toLowerCase().startsWith("parentpage")) {
+              placeholder.splice(placeholder.indexOf(ln), 1)
+              info.parentPage = ln.substring("parentpage:".length).split(" ").filter(v=>!!v).join(" ").trim().replace(/~/g,':')
+            } else if (ln.toLowerCase().startsWith("parent")) {
+              placeholder.splice(placeholder.indexOf(ln), 1)
+              info.parentPage = ln.substring("parent:".length).split(" ").filter(v=>!!v).join(" ").trim().replace(/~/g,':')
+            } else if (ln.toLowerCase().startsWith("comments")) {
+              placeholder.splice(placeholder.indexOf(ln), 1)
+              info.comments = ln.substring("comments:".length).split(" ").filter(v=>!!v).join(" ");
+            }
+          }
+          if (placeholder.length) {
+            console.log(`[WARN] Multiline comments are not supported anymore as Wikidot does not separate comment lines.\n       Please put all of your comments on one line. (:${s}:${p.replace(/~/g,':').split(".")[0]})`)
+          }
+        }
+      }      
       queue.push({s, p:p.replace(/~/g,':').split(".")[0], info, requeue: false});
     }
   }
