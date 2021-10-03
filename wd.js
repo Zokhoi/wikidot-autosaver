@@ -31,7 +31,7 @@ module.exports = class WD {
       try {
         res = await got.post(base, {
           headers: {
-            'User-Agent': 'WDAutosaver/1.1',
+            'User-Agent': 'WDAutosaver/1.2',
             // 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0',
             // 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
             Referer: 'wikidot autosaver',
@@ -77,7 +77,7 @@ module.exports = class WD {
     const wikidotToken7 = Math.random().toString(36).substring(4);
     let res = await got.post('https://www.wikidot.com/default--flow/login__LoginPopupScreen', {
       headers: {
-        'User-Agent': 'WDAutosaver/1.1',
+        'User-Agent': 'WDAutosaver/1.2',
         Referer: 'wikidot autosaver',
         Cookie: `wikidot_token7=${wikidotToken7}`
       },
