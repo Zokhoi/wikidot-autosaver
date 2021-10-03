@@ -27,19 +27,29 @@ module.exports = class WD {
 
   async req(base, params={}) {
       const wikidotToken7 = Math.random().toString(36).substring(4);
-      let res = await got.post(base, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0',
-          // 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-          Referer: 'wikidot autosaver',
-          Cookie: `wikidot_token7=${wikidotToken7}; ${this.cookie.auth}`,
-        },
-        form: Object.assign({wikidot_token7: wikidotToken7, callbackIndex: 0}, params)
-      }).json();
+      let res, e;
+      try {
+        res = await got.post(base, {
+          headers: {
+            'User-Agent': 'WDAutosaver/1.1',
+            // 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0',
+            // 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            Referer: 'wikidot autosaver',
+            Cookie: `wikidot_token7=${wikidotToken7}; ${this.cookie.auth}`,
+          },
+          form: Object.assign({wikidot_token7: wikidotToken7, callbackIndex: 0}, params)
+        }).json();
+      } catch (err) {
+        e = err;
+        e.status = e.response.statusCode;
+        throw e;
+      }
       if (res.status!='ok') {
-        let e = new Error(res.message);
+        e = new Error(res.message);
         e.status = res.status;
         e.src = res;
+      }
+      if (e) {
         throw e;
       } else return res;
   };
@@ -67,7 +77,7 @@ module.exports = class WD {
     const wikidotToken7 = Math.random().toString(36).substring(4);
     let res = await got.post('https://www.wikidot.com/default--flow/login__LoginPopupScreen', {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0',
+        'User-Agent': 'WDAutosaver/1.1',
         Referer: 'wikidot autosaver',
         Cookie: `wikidot_token7=${wikidotToken7}`
       },
@@ -97,7 +107,7 @@ module.exports = class WD {
     if (lock.status!='ok') {
       let e = new Error(lock.message);
       e.status = lock.status;
-      e.src = lock;
+      e.response = lock;
       throw e;
     }
     return await this.action(base, 'WikiPageAction', Object.assign({

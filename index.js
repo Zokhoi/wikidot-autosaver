@@ -118,12 +118,12 @@ const wd = new WD(config.site);
     await wd.edit(s, p, info)
       .catch(e=>{
       err = e;
-      switch (e.message) {
-        case "Response code 500 (Internal Server Error)":
+      switch (e.status) {
+        case 500:
           console.log(`Error at editing :${s}:${p} : Response code 500 (Internal Server Error)`);
           break;
           
-        case "An error occurred while processing the request.":
+        case "not_ok":
           // Wikidot now dies when new page is created with tags in its options
           // Put them in queue for seperate processing of page creation and tags
           let tags = info.tags;
@@ -131,8 +131,8 @@ const wd = new WD(config.site);
           queue.push({s,p,info,requeue:true}, {s,p,info:Object.assign({tags}, info),requeue:true});
           break;
           
-        default: 
-          console.log(`Error at editing :${s}:${p} : ${JSON.stringify(e.src,null,2)}`);
+        default:
+          console.log(`Error at editing :${s}:${p} : ${typeof e.status == "number" ? e.message : JSON.stringify(e.src,null,2)}`);
           break;
       }
     }).finally(()=>{
