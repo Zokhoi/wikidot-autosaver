@@ -50,7 +50,7 @@ const wd = new WD(config.site);
     await wd.askLogin().catch(e=>{tmp=e; console.log(e.message)});
   }
   console.log("Successfully logged in.")
-  let wait = 0;
+  let queue = [];
   for (let s of dir) {
     let pages = fs.readdirSync(path.join(config.source,s))
                   .filter(f => {
@@ -76,7 +76,7 @@ const wd = new WD(config.site);
         parentPage: "",
       }
       let sauce = raw.split(/~{4,}/);
-      let tilde = raw.match(/~{4,}/gi);
+      let tilde = raw.match(/~{4,}/gi) || [];
       tilde.shift();
       let tmp = [];
       if (sauce.length===1) {
@@ -108,22 +108,42 @@ const wd = new WD(config.site);
           }
         }
       }
-      setTimeout(async ()=>{
-        let err = null;
-        wd.edit(s, p.replace(/~/g,':').split(".")[0], info)
-          .catch(e=>{
-          err = e;
-          if (e.message!="Response code 500 (Internal Server Error)") {
-            console.log(`Error at editing :${s}:${p.replace(/~/g,':').split(".")[0]} : ${JSON.stringify(e.src,null,2)}`)
-          }
-        }).finally(()=>{
-          if (!err) {
-            console.log(`Successfully posted to http://${s}.wikidot.com/${p.replace(/~/g,':').split(".")[0]}`);
-          }
-        })
-      }, (pages.indexOf(p)*3000+wait))
+      queue.push({s, p:p.replace(/~/g,':').split(".")[0], info, requeue: false});
     }
-    wait+=pages.length*3000;
+  }
+  
+  for (let i = 0; i < queue.length; i++) {    
+    let err = null;
+    let s = queue[i].s, p = queue[i].p, info = queue[i].info, requeue = queue[i].requeue;
+    await wd.edit(s, p, info)
+      .catch(e=>{
+      err = e;
+      switch (e.message) {
+        case "Response code 500 (Internal Server Error)":
+          console.log(`Error at editing :${s}:${p} : Response code 500 (Internal Server Error)`);
+          break;
+          
+        case "An error occurred while processing the request.":
+          // Wikidot now dies when new page is created with tags in its options
+          // Put them in queue for seperate processing of page creation and tags
+          let tags = info.tags;
+          delete info.tags;
+          queue.push({s,p,info,requeue:true}, {s,p,info:Object.assign({tags}, info),requeue:true});
+          break;
+          
+        default: 
+          console.log(`Error at editing :${s}:${p} : ${JSON.stringify(e.src,null,2)}`);
+          break;
+      }
+    }).finally(()=>{
+      if (!err) {
+        if (requeue) {
+          console.log(`Successfully ${info.tags ? "tagged" : "posted to"} :${s}:${p}`);
+        } else console.log(`Successfully posted to :${s}:${p}`);
+      }
+    })
+    
+    await (new Promise((resolve)=>{ setTimeout(()=>{ resolve() }, 3000)}));
   }
   fs.writeFileSync(lmpath,
     JSON.stringify(lastModified, null, 2), 'utf-8');
