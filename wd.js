@@ -48,8 +48,6 @@ module.exports = class WD {
         e = new Error(res.message);
         e.status = res.status;
         e.src = res;
-      }
-      if (e) {
         throw e;
       } else return res;
   };

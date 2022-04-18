@@ -18,24 +18,22 @@
  ### Config
  Set up [config.yml](./config-example.yml) or [config.json](./config-example.json) and rename as `config.yml` or `config.json` with the following options:
 
- * `site`: `Array` of `String` indicating what wikidot sites you are going to save to. <br/>
- e.g. `["scp-sandbox-3", "wanderers-sandbox"]` means that you are going to save to `http://scp-sandbox-3.wikidot.com` and `http://wanderers-sandbox.wikidot.com`.
  * `source`: `String` indicating the folder path where all your wikidot files are located.
- * `pages`: `String` or `Array` of `String` indicating the pages you want to save to wikidot:
-  * `*` indicates you want to save all existing files in the under the site folder to wikidot;
-  * `"page-name"` indicates you want to save only the specified _page-name_ to wikidot;
-  * `["page-name-1", "page-name-2"]` indicates you want to save only _page-name-1_ and _page-name-2_ to wikidot.
+ * `pages`: key: `String`, value: `String` or `String[]`:
+  * key indicates the directory to look in, and is the default site to save to for all files under that directory:
+    * `"scp-sandbox-3"` means to look under that directory, and that you are going to save to `http://scp-sandbox-3.wikidot.com` by default, if not otherwise specified in the files
+  * value indicates the files you want to save to the wikidot site:
+    * `*` indicates you want to save all existing files in the under the site folder to wikidot;
+    * `"file-name"` indicates you want to save only the specified _file-name_ file to wikidot;
+    * `["file-name-1", "file-name-2"]` indicates you want to save only _file-name-1_ and _file-name-2_ files to wikidot.
 
 
 ----
 ### Autosave Folder Structure
-The script auto-generates folders named with sites specified in the config in the folder specified source folder path. <br />
+The script auto-generates folders named with sites specified in the config in the specified source folder path. <br />
 e.g. if you want to save to `scp-sandbox-3` page `a`, and to `wanderers-sandbox` pages `b:c` and `e`, <br />
 `config.yml`:
 ```yaml
-site:
-  - "scp-sandbox-3"
-  - "wanderers-sandbox"
 source: "D:/Wikidot/"
 pages:
   scp-sandbox-3: "*"
@@ -46,7 +44,6 @@ pages:
 or equivalently `config.json`:
 ```json
 {
-  "site": ["scp-sandbox-3", "wanderers-sandbox"],
   "source": "D:/Wikidot/",
   "pages": {
     "scp-sandbox-3": "*",
@@ -57,22 +54,36 @@ or equivalently `config.json`:
   }
 }
 ```
-Then the folder structure in `D:/Wikidot/` can be:
+Then the folder structure in `D:/Wikidot/` will be:
 ```
 .
 ├──scp-sandbox-3
 |   └──a.txt
 ├──wanderers-sandbox
 |   ├──b~c.txt
-|   ├──d.txt
 |   └──e.txt
 ```
-And `d.txt` will not be saved to wikidot. <br />
+Any other files in the specified site directory will be ignored. <br />
 Note that colons are converted into tildes, as colons are forbidden symbols for file names in Windows.
 
 ----
 ### File Content Structure
 The file that you save should be of the following content structure:
+``` yaml
+---
+title: (your title here)
+tags: (tags here)
+parent: (full parent page name here)
+comments: (revision comment here)
+site: (the wikidot site the page belongs to here)
+page: (the page unix name here)
+---
+(your page source here)
+```
+If `site` and `page` is supplied, it will override the site and page settings according to directory and file name. <br />
+If not supplied, the default is to use the directory name for `site` and file name (without file extension) for `page`.
+
+The old content structure is deprecated and are automatically converted to yaml frontmatter if detected:
 ```
 title: (your title here)
 tags: (tags here)
@@ -81,14 +92,4 @@ comments: (revision comment here)
 ~~~~~~
 (your page source here)
 ```
-or with YAML front matter:
-``` yaml
----
-title: (your title here)
-tags: (tags here)
-parent: (full parent page name here)
-comments: (revision comment here)
----
-(your page source here)
-```
-Any of title, tags, parent and comment are optional but are suggested to be kept even if they are empty, for your own ease.
+Any of `site`, `page`, `title`, `tags`, `parent` and `comment` are optional.

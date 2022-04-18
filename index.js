@@ -36,13 +36,15 @@ if (fs.existsSync(lmpath)) {
   fs.writeFileSync(lmpath, '{}', 'utf-8');
 }
 
+let sites = [];
+for (let key in config.pages) { sites.push(key) }
 let dir = fs.readdirSync(config.source)
-            .filter(f => fs.statSync(path.join(config.source,f)).isDirectory()&&config.site.includes(f));
-for (let s of config.site) {
+            .filter(f => fs.statSync(path.join(config.source,f)).isDirectory()&&sites.includes(f));
+for (let s of sites) {
   if (!lastModified[s]) { lastModified[s] = {} }
   if (!dir.includes(s)) { fs.mkdirSync(path.join(config.source, s)); }
 }
-const wd = new WD(config.site);
+const wd = new WD(sites);
 
 !(async ()=>{
   let tmp = true;
@@ -69,13 +71,8 @@ const wd = new WD(config.site);
     for (let p of pages) {
       let raw = fs.readFileSync(path.join(config.source,s,p), 'utf-8');
       lastModified[s][p] = fs.statSync(path.join(config.source,s,p)).mtimeMs;
-      let info = {
-        title: "",
-        source: "",
-        comments: "",
-        tags: "",
-        parentPage: "",
-      }
+      let info = {};
+      let meta = { site: s, page: p.replace(/~/g,':').split(".")[0] };
       if (fm.test(raw)) {
         let content = fm(raw);
         if (content.attributes.title && typeof content.attributes.title == 'string') info.title = content.attributes.title;
@@ -96,6 +93,8 @@ const wd = new WD(config.site);
         if (content.attributes.parent && typeof content.attributes.parent == 'string') info.parent = content.attributes.parent;
         if (content.attributes.comments && typeof content.attributes.comments == 'string') info.comments = content.attributes.comments;
         info.source = content.body;
+        if (content.attributes.site && typeof content.attributes.site == 'string') meta.site = content.attributes.site;
+        if (content.attributes.page && typeof content.attributes.page == 'string') meta.page = content.attributes.page;
       } else {
         let sauce = raw.split(/~{4,}/);
         let tilde = raw.match(/~{4,}/gi) || [];
@@ -134,9 +133,17 @@ const wd = new WD(config.site);
           if (placeholder.length) {
             console.log(`[WARN] Multiline comments are not supported anymore as Wikidot does not separate comment lines.\n       Please put all of your comments on one line. (:${s}:${p.replace(/~/g,':').split(".")[0]})`)
           }
+          meta = Object.assign(meta, info);
+          delete meta.source;
+          if (meta.parentPage !== undefined) {
+            meta.parent = meta.parentPage;
+            delete meta.parentPage;
+          }
+          fs.writeFileSync(path.join(config.source,s,p), `---\n${yaml.dump(meta)}---\n${info.source}`, 'utf-8');
+          lastModified[s][p] = fs.statSync(path.join(config.source,s,p)).mtimeMs;     
         }
-      }      
-      queue.push({s, p:p.replace(/~/g,':').split(".")[0], info, requeue: false});
+      }
+      queue.push({s:meta.site, p:meta.page, info, requeue: false});
     }
   }
   
